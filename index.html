@@ -3,193 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v12.2</title>
+    <title>Bio-Lab Master v12.3</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Orbitron:wght@600;900&display=swap');
-        :root { --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); --neon-blue: #00d2ff; --neon-pink: #ff00e0; }
-        body { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Fredoka', sans-serif; background: #050a18; color: white; }
+        :root { --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); --neon: #00d2ff; }
+        body { margin: 0; background: #050a18; color: white; font-family: 'Fredoka', sans-serif; height: 100vh; overflow: hidden; }
         
-        /* FUNDO DINÂMICO */
-        .stars-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%); z-index: -1; }
+        #splash-screen { position: fixed; inset: 0; background: #050a18; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .card { padding: 30px; border-radius: 20px; border: 2px solid var(--neon); text-align: center; background: #0a1128; box-shadow: 0 0 20px var(--neon); }
         
-        /* TELA DE APRESENTAÇÃO */
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 10, 24, 0.98); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .splash-card { padding: 40px; border-radius: 30px; border: 3px solid var(--neon-blue); text-align: center; background: #050a18; box-shadow: 0 0 30px var(--neon-blue); width: 90%; max-width: 400px; }
-        
-        /* APP PRINCIPAL */
         #main-app { display: none; flex-direction: column; height: 100vh; }
-        header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon-blue); background: rgba(0,0,0,0.5); }
+        header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); background: rgba(0,0,0,0.8); }
+        
         .wrapper { display: flex; flex: 1; overflow: hidden; padding: 10px; gap: 10px; }
-        .sidebar { width: 320px; overflow-y: auto; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; }
+        .sidebar { width: 300px; overflow-y: auto; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; }
         
-        /* PISTA DE CORRIDA */
-        .track-container { flex: 1; position: relative; background: rgba(0,0,0,0.3); border-radius: 20px; padding: 20px; overflow-y: auto; }
-        .rainbow-bridge { position: absolute; right: 60px; top: 0; bottom: 0; width: 40px; background: var(--rainbow); opacity: 0.3; border-radius: 20px; }
-        .lane { height: 70px; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; display: flex; align-items: center; }
-        .runner { position: absolute; transition: 1s ease-in-out; display: flex; flex-direction: column; align-items: center; }
-        .runner-tag { background: white; color: black; font-size: 10px; padding: 2px 6px; border-radius: 5px; font-weight: bold; margin-bottom: 2px; white-space: nowrap; }
+        .track-container { flex: 1; position: relative; background: #000; border-radius: 15px; border: 1px solid #1e293b; overflow-y: auto; padding: 10px; }
+        .rainbow-line { position: absolute; right: 50px; top: 0; bottom: 0; width: 15px; background: var(--rainbow); opacity: 0.4; border-radius: 10px; }
         
-        /* COMPONENTES */
-        .panel { background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 10px; padding: 10px; }
-        .btn-cosmic { background: var(--rainbow); border: none; color: white; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
-        .student-card { background: rgba(0,0,0,0.3); border: 1px solid var(--neon-pink); padding: 8px; border-radius: 10px; margin-bottom: 8px; }
-        .editable { cursor: pointer; border-bottom: 1px dashed var(--neon-blue); }
-        input, textarea { background: #000; color: #fff; border: 1px solid var(--neon-blue); padding: 5px; border-radius: 5px; width: 100%; box-sizing: border-box; }
-        .check-grid { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+        .lane { height: 65px; border-bottom: 1px solid #1e293b; position: relative; display: flex; align-items: center; }
+        .runner { position: absolute; transition: 0.8s; display: flex; flex-direction: column; align-items: center; }
+        .runner-tag { background: white; color: black; font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: bold; }
+        
+        .stu-item { background: rgba(255,255,255,0.03); border: 1px solid #334155; padding: 8px; border-radius: 8px; margin-bottom: 5px; position: relative; }
+        .del-btn { position: absolute; top: 5px; right: 5px; color: #ef4444; cursor: pointer; font-size: 12px; font-weight: bold; }
+        
+        .editable { cursor: pointer; text-decoration: underline dotted var(--neon); }
+        button { cursor: pointer; border-radius: 5px; border: none; font-weight: bold; }
+        .btn-go { background: var(--rainbow); color: white; padding: 10px 20px; }
+        input, textarea { background: #000; color: #fff; border: 1px solid #334155; padding: 5px; border-radius: 5px; width: 100%; margin: 5px 0; }
+        .checks { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div class="stars-bg"></div>
 
     <div id="splash-screen">
-        <div class="splash-card">
-            <h1 style="font-family:'Orbitron'; color:var(--neon-blue); margin:0;">BIO-LAB</h1>
-            <p>COSMIC CAMPUS v12.2</p>
-            <input type="text" id="sch-in" placeholder="NOME DA ESCOLA" style="margin-bottom:10px;">
-            <input type="text" id="tea-in" placeholder="PROFESSOR(A)">
-            <button class="btn-cosmic" onclick="enterApp()">ENTRAR 🚀</button>
+        <div class="card">
+            <h1 style="font-family:'Orbitron'; color:var(--neon);">BIO-LAB 12.3</h1>
+            <input type="text" id="in-sch" placeholder="Escola">
+            <input type="text" id="in-tea" placeholder="Professor(a)">
+            <button class="btn-go" onclick="start()">ENTRAR 🚀</button>
         </div>
     </div>
 
     <div id="main-app">
         <header>
             <div>
-                <span class="editable" id="h-sch" onclick="editAny('Escola', 'h-sch', 'sch')">Escola</span> | 
-                <span class="editable" id="h-tea" onclick="editAny('Professor', 'h-tea', 'tea')">Profª</span>
+                <span class="editable" onclick="editVal('sch')">Escola</span> | 
+                <span class="editable" onclick="editVal('tea')">Profª</span>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="showSplash()" style="font-size:10px; cursor:pointer;">MODO APRESENTAÇÃO</button>
-                <button onclick="exportExcel()" style="background:green; color:white; border:none; padding:5px; border-radius:5px; cursor:pointer;">Excel</button>
-            </div>
+            <button onclick="location.reload()" style="font-size:10px;">SAIR/APRESENTAR</button>
         </header>
 
         <div class="wrapper">
             <aside class="sidebar">
-                <div class="panel">
-                    <b>TURMAS</b>
-                    <div id="class-tabs"></div>
-                    <input type="text" id="new-cl" placeholder="+ Turma" onkeypress="if(event.key==='Enter') addClass()">
-                </div>
+                <div id="class-list" style="margin-bottom:15px;"></div>
+                <input type="text" id="add-cl" placeholder="+ Turma (Enter)" onkeypress="if(event.key==='Enter') addC()">
                 
-                <div id="student-zone" style="display:none;">
-                    <div class="panel">
-                        <b>MATÉRIAS/ALUNOS</b>
-                        <div id="subj-tabs" style="margin:5px 0;"></div>
-                        <textarea id="names-in" placeholder="Cole nomes e clique importar" style="height:50px;"></textarea>
-                        <button class="btn-cosmic" onclick="importStudents()">IMPORTAR</button>
-                    </div>
-                    <div id="stu-list"></div>
+                <div id="stu-area" style="display:none; margin-top:20px;">
+                    <textarea id="names" placeholder="Cole os nomes..." style="height:60px;"></textarea>
+                    <button class="btn-go" onclick="impS()" style="width:100%">IMPORTAR</button>
+                    <div id="list" style="margin-top:10px;"></div>
                 </div>
             </aside>
 
             <main class="track-container">
-                <div id="bim-nav" style="margin-bottom:10px; display:flex; gap:5px;"></div>
-                <div class="track" id="track">
-                    <div class="rainbow-bridge"></div>
-                </div>
+                <div id="bims" style="display:flex; gap:5px; margin-bottom:10px;"></div>
+                <div class="track" id="track"><div class="rainbow-line"></div></div>
+                <button onclick="exportX()" style="position:fixed; bottom:20px; right:20px; background:#22c55e; color:white; padding:10px;">BAIXAR EXCEL</button>
             </main>
         </div>
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('biolab_v12.2')) || { classes: [], activeClassIdx: -1, activeBim: 1 };
-        const emojis = ['🚀','🧬','🧪','🌟','🛸','👾'];
+        let d = JSON.parse(localStorage.getItem('bl123')) || { cs: [], ci: -1, b: 1 };
+        const em = ['🚀','🧬','🧪','🌟','🛸','👾','🪐'];
 
-        function save() { localStorage.setItem('biolab_v12.2', JSON.stringify(state)); }
-
-        function showSplash() { document.getElementById('splash-screen').style.display='flex'; }
-
-        function enterApp() {
-            const s = document.getElementById('sch-in').value || localStorage.getItem('sch') || 'Escola';
-            const t = document.getElementById('tea-in').value || localStorage.getItem('tea') || 'Professora';
+        function save() { localStorage.setItem('bl123', JSON.stringify(d)); }
+        
+        function start() {
+            let s = document.getElementById('in-sch').value || localStorage.getItem('sch') || 'Escola';
+            let t = document.getElementById('in-tea').value || localStorage.getItem('tea') || 'Professora';
             localStorage.setItem('sch', s); localStorage.setItem('tea', t);
-            document.getElementById('h-sch').innerText = s;
-            document.getElementById('h-tea').innerText = t;
             document.getElementById('splash-screen').style.display='none';
             document.getElementById('main-app').style.display='flex';
             render();
         }
 
-        function editAny(label, elementId, storageKey) {
-            let val = prompt("Editar " + label, document.getElementById(elementId).innerText);
-            if(val) { 
-                document.getElementById(elementId).innerText = val;
-                if(storageKey) localStorage.setItem(storageKey, val);
-            }
+        function editVal(k) {
+            let n = prompt("Novo valor:", localStorage.getItem(k));
+            if(n) { localStorage.setItem(k, n); render(); }
         }
 
-        function editStudent(idx) {
-            let n = prompt("Nome do aluno:", state.classes[state.activeClassIdx].students[idx].name);
-            if(n) { state.classes[state.activeClassIdx].students[idx].name = n; save(); render(); }
+        function addC() {
+            let v = document.getElementById('add-cl').value;
+            if(v) { d.cs.push({n:v, ss:['Geral'], si:0, st:[]}); d.ci = d.cs.length-1; document.getElementById('add-cl').value=''; save(); render(); }
         }
 
-        function addClass() {
-            let n = document.getElementById('new-cl').value;
-            if(n) { state.classes.push({name:n, subjects:['Ciências'], activeSubjIdx:0, students:[]}); state.activeClassIdx = state.classes.length-1; document.getElementById('new-cl').value=''; save(); render(); }
-        }
-
-        function importStudents() {
-            let raw = document.getElementById('names-in').value.split('\n').filter(x=>x.trim());
-            raw.forEach(n => state.classes[state.activeClassIdx].students.push({name:n.trim(), emoji:emojis[Math.floor(Math.random()*emojis.length)], scores:{}}));
-            state.classes[state.activeClassIdx].students.sort((a,b)=>a.name.localeCompare(b.name));
-            document.getElementById('names-in').value=''; save(); render();
-        }
-
-        function getScore(stu) {
-            let cls = state.classes[state.activeClassIdx];
-            let key = `${cls.activeSubjIdx}_${state.activeBim}`;
-            return (stu.scores[key] || []).length;
+        function impS() {
+            let n = document.getElementById('names').value.split('\n').filter(x=>x.trim());
+            n.forEach(x => d.cs[d.ci].st.push({n:x.trim(), e:em[Math.floor(Math.random()*em.length)], sc:{}}));
+            d.cs[d.ci].st.sort((a,b)=>a.n.localeCompare(b.n));
+            document.getElementById('names').value=''; save(); render();
         }
 
         function render() {
-            const cls = state.classes[state.activeClassIdx];
-            document.getElementById('class-tabs').innerHTML = state.classes.map((c,i)=>`<button onclick="state.activeClassIdx=${i};render()" style="${i===state.activeClassIdx?'border:2px solid gold':''}">${c.name}</button>`).join(' ');
+            const c = d.cs[d.ci];
+            document.getElementById('class-list').innerHTML = d.cs.map((x,i)=>`<button onclick="d.ci=${i};render()" style="margin:2px; ${i===d.ci?'border:2px solid gold':''}">${x.n}</button>`).join('');
             
-            if(cls) {
-                document.getElementById('student-zone').style.display='block';
-                document.getElementById('subj-tabs').innerHTML = cls.subjects.map((s,i)=>`<span class="editable" onclick="state.classes[state.activeClassIdx].activeSubjIdx=${i};render()" style="margin-right:10px;${i===cls.activeSubjIdx?'color:cyan;font-weight:bold':''}">${s}</span>`).join('');
-                document.getElementById('bim-nav').innerHTML = [1,2,3,4].map(b => `<button onclick="state.activeBim=${b};render()" style="${b===state.activeBim?'background:cyan;color:black':''}">${b}º BIM</button>`).join(' ');
+            if(c) {
+                document.getElementById('stu-area').style.display='block';
+                document.getElementById('bims').innerHTML = [1,2,3,4].map(x=>`<button onclick="d.b=${x};render()" style="${x===d.b?'background:cyan':''}">${x}º BIM</button>`).join('');
                 
-                // Lista lateral
-                document.getElementById('stu-list').innerHTML = cls.students.map((s,i) => {
-                    let key = `${cls.activeSubjIdx}_${state.activeBim}`;
-                    let checks = '';
+                document.getElementById('list').innerHTML = c.st.map((s,si) => {
+                    let k = `${c.si}_${d.b}`, ch = '';
                     for(let j=0; j<10; j++) {
-                        let chk = (s.scores[key] && s.scores[key].includes(j)) ? 'checked' : '';
-                        checks += `<input type="checkbox" ${chk} onclick="toggleCheck(${i}, '${key}', ${j})">`;
+                        let checked = (s.sc[k] && s.sc[k].includes(j)) ? 'checked' : '';
+                        ch += `<input type="checkbox" ${checked} onclick="tgl(${si},'${k}',${j})">`;
                     }
-                    return `<div class="student-card"><span class="editable" onclick="editStudent(${i})">${s.name}</span><div class="check-grid">${checks}</div></div>`;
+                    return `<div class="stu-item"><span class="editable" onclick="edS(${si})">${s.n}</span><span class="del-btn" onclick="delS(${si})">X</span><div class="checks">${ch}</div></div>`;
                 }).join('');
 
-                // Track
                 let t = document.getElementById('track');
                 t.querySelectorAll('.lane').forEach(l=>l.remove());
-                cls.students.forEach(s => {
-                    let sc = getScore(s);
+                c.st.forEach(s => {
+                    let sc = (s.sc[`${c.si}_${d.b}`] || []).length;
                     let lane = document.createElement('div'); lane.className='lane';
-                    lane.innerHTML = `<div class="runner" style="left:${sc*9}%"><div class="runner-tag">${s.name}</div><div style="font-size:30px">${s.emoji}</div></div>`;
+                    lane.innerHTML = `<div class="runner" style="left:${sc*9}%"><div class="runner-tag">${s.n}</div><div style="font-size:25px">${s.e}</div></div>`;
                     t.appendChild(lane);
                 });
             }
         }
 
-        function toggleCheck(si, key, val) {
-            let s = state.classes[state.activeClassIdx].students[si];
-            if(!s.scores[key]) s.scores[key] = [];
-            let i = s.scores[key].indexOf(val);
-            if(i > -1) s.scores[key].splice(i,1); else s.scores[key].push(val);
+        function tgl(si, k, v) {
+            let s = d.cs[d.ci].st[si];
+            if(!s.sc[k]) s.sc[k] = [];
+            let i = s.sc[k].indexOf(v);
+            if(i > -1) s.sc[k].splice(i,1); else s.sc[k].push(v);
             save(); render();
         }
 
-        function exportExcel() {
-            let cls = state.classes[state.activeClassIdx];
-            let csv = `Relatorio;${cls.name}\nAluno;Nota\n`;
-            cls.students.forEach(s => csv += `${s.name};${getScore(s)}\n`);
-            let blob = new Blob(["\ufeff"+csv], {type:'text/csv'});
-            let a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${cls.name}.csv`; a.click();
+        function delS(i) { if(confirm("Excluir?")) { d.cs[d.ci].st.splice(i,1); save(); render(); } }
+        function edS(i) { let n = prompt("Nome:", d.cs[d.ci].st[i].n); if(n) { d.cs[d.ci].st[i].n = n; save(); render(); } }
+
+        function exportX() {
+            let c = d.cs[d.ci];
+            let csv = `Relatorio;${c.n}\nAluno;Nota\n`;
+            c.st.forEach(s => csv += `${s.n};${(s.sc[`${c.si}_${d.b}`] || []).length}\n`);
+            let b = new Blob(["\ufeff"+csv], {type:'text/csv'});
+            let a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`BioLab_${c.n}.csv`; a.click();
         }
 
-        window.onload = () => { if(localStorage.getItem('sch')) enterApp(); };
+        window.onload = () => { if(localStorage.getItem('sch')) start(); };
     </script>
 </body>
 </html>
