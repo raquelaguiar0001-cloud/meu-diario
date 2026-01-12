@@ -3,212 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v12.4</title>
+    <title>BioLab v12.5 - Full Restore</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Orbitron:wght@600;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;700&display=swap');
         
         :root {
-            --rainbow: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
-            --neon-blue: #00d2ff;
-            --glass: rgba(255, 255, 255, 0.1);
+            --lab-bg: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
+            --bio-green: #2ecc71;
+            --chem-blue: #3498db;
+            --accent-pink: #e91e63;
+            --glass: rgba(255, 255, 255, 0.8);
         }
 
         body {
-            margin: 0; padding: 0; height: 100vh; overflow: hidden;
-            font-family: 'Fredoka', sans-serif;
-            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
-            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0; background: var(--lab-bg);
+            color: #2c3e50; height: 100vh; overflow: hidden;
         }
 
-        /* NUVENS FLUTUANTES */
-        .cloud { position: absolute; background: white; border-radius: 50%; opacity: 0.1; filter: blur(30px); animation: float 25s infinite linear; z-index: 0; }
-        @keyframes float { from { transform: translateX(-300px); } to { transform: translateX(1200px); } }
+        /* NUVENS E ANIMAÇÕES VOLTARAM */
+        .bg-elements { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .cloud { position: absolute; background: white; border-radius: 50px; opacity: 0.6; filter: blur(15px); animation: float 25s infinite linear; }
+        .bubble { position: absolute; bottom: -50px; background: rgba(46, 204, 113, 0.2); border-radius: 50%; animation: rise 12s infinite ease-in; }
 
-        /* INTERFACE ESTILO VIDRO */
-        #splash-screen {
-            position: fixed; inset: 0; background: rgba(5, 10, 24, 0.9);
-            display: flex; align-items: center; justify-content: center; z-index: 1000;
-        }
-        .splash-card {
-            padding: 50px; border-radius: 40px; border: 3px solid var(--neon-blue);
-            background: rgba(10, 20, 40, 0.8); backdrop-filter: blur(15px); text-align: center;
-        }
+        @keyframes float { from { transform: translateX(-200px); } to { transform: translateX(1200px); } }
+        @keyframes rise { 0% { transform: translateY(0) scale(1); opacity: 0.8; } 100% { transform: translateY(-1000px) scale(1.5); opacity: 0; } }
 
-        #main-app { display: none; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
-        
+        #main-app { display: flex; flex-direction: column; height: 100vh; }
+
         header {
-            padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.05); border-bottom: 2px solid var(--neon-blue);
+            background: white; padding: 15px 25px; display: flex; justify-content: space-between; 
+            align-items: center; border-bottom: 4px solid var(--chem-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .wrapper { display: flex; flex: 1; overflow: hidden; padding: 15px; gap: 15px; }
+        .wrapper { display: flex; flex: 1; overflow: hidden; padding: 10px; gap: 10px; }
         
-        .sidebar { width: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .panel { 
-            background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 20px; padding: 15px; backdrop-filter: blur(10px);
-        }
+        /* SIDEBAR COMPLETA */
+        .sidebar { width: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .panel { background: var(--glass); border-radius: 20px; border: 2px solid #dcdde1; overflow: hidden; }
+        .panel-header { padding: 12px; background: #f5f6fa; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; }
+        .panel-content { padding: 15px; border-top: 1px solid #dcdde1; }
 
-        /* PISTA DE CORRIDA IGUAL À IMAGEM */
-        .track-container { 
-            flex: 1; position: relative; background: rgba(0,0,0,0.4); 
-            border-radius: 30px; border: 2px solid rgba(0, 210, 255, 0.3); padding: 20px; 
+        .btn-action { 
+            background: var(--bio-green); color: white; border: none; padding: 10px; 
+            border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s;
         }
-        .rainbow-bridge { 
-            position: absolute; right: 80px; top: 20px; bottom: 20px; width: 45px; 
-            background: var(--rainbow); opacity: 0.5; border-radius: 50px; filter: blur(2px);
-        }
+        .btn-action:hover { filter: brightness(1.1); }
 
-        .lane { height: 75px; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; display: flex; align-items: center; }
-        .runner { position: absolute; transition: 1.2s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; flex-direction: column; align-items: center; }
-        .runner-tag { background: white; color: black; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 10px; margin-bottom: 4px; }
+        /* PISTA DE CORRIDA COLORIDA */
+        .track-container { flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.4); border-radius: 25px; border: 2px solid #fff; padding: 20px; }
+        .track { flex: 1; position: relative; overflow-y: auto; border-right: 15px solid; border-image: linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet) 1; }
         
-        /* BOTÕES E INPUTS */
-        .btn-cosmic { background: var(--rainbow); border: none; color: white; padding: 10px; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; }
-        .editable { cursor: pointer; border-bottom: 1px dashed var(--neon-blue); transition: 0.2s; }
-        .editable:hover { color: var(--neon-blue); }
-        input, textarea { background: rgba(0,0,0,0.5); color: white; border: 1px solid var(--neon-blue); padding: 10px; border-radius: 10px; width: 100%; box-sizing: border-box; margin: 5px 0; }
-        
-        .student-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; margin-bottom: 10px; border-left: 4px solid var(--neon-blue); }
-        .check-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--neon-blue); }
+        .lane { height: 80px; border-bottom: 1px dashed rgba(0,0,0,0.1); position: relative; display: flex; align-items: center; }
+        .runner { position: absolute; transition: 1.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); text-align: center; }
+        .runner-tag { background: white; border: 2px solid var(--chem-blue); padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+
+        .editable:hover { background: rgba(52, 152, 219, 0.1); border-radius: 5px; cursor: pointer; }
+        input, textarea { width: 100%; padding: 8px; border-radius: 10px; border: 1px solid #ccc; margin-bottom: 5px; box-sizing: border-box; }
+
+        .student-card { background: white; border-radius: 15px; padding: 12px; margin-bottom: 10px; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
-    <div class="cloud" style="width:300px;height:150px;top:10%;left:-100px;"></div>
-    <div class="cloud" style="width:400px;height:200px;top:50%;left:200px;animation-delay:5s;"></div>
-
-    <div id="splash-screen">
-        <div class="splash-card">
-            <h1 style="font-family:'Orbitron'; font-size: 2.5rem; margin:0; color:var(--neon-blue);">BIO-LAB MASTER</h1>
-            <p style="letter-spacing: 3px;">DESIGN PREMIUM v12.4</p>
-            <input type="text" id="sch-in" placeholder="Nome da Escola">
-            <input type="text" id="tea-in" placeholder="Professor(a)">
-            <button class="btn-cosmic" onclick="startApp()" style="margin-top:15px;">INICIAR LABORATÓRIO 🚀</button>
-        </div>
-    </div>
+    <div class="bg-elements" id="bg-anim"></div>
 
     <div id="main-app">
         <header>
-            <div style="font-size: 1.2rem;">
-                <span class="editable" id="txt-sch" onclick="editH('sch')">Escola</span> | 
-                <span class="editable" id="txt-tea" onclick="editH('tea')">Profª</span>
-            </div>
+            <h2 class="editable" onclick="editH('sch')">🧪 BioLab Master</h2>
             <div style="display:flex; gap:10px;">
-                <button onclick="location.reload()" style="background:none; color:white; border:1px solid white; border-radius:8px; padding:5px 15px; cursor:pointer;">Modo Apresentação</button>
-                <button onclick="exportX()" style="background:#22c55e; color:white; border:none; border-radius:8px; padding:5px 15px; cursor:pointer; font-weight:bold;">BAIXAR EXCEL</button>
+                <button onclick="exportToExcel()" style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer;">📊 SALVAR EXCEL</button>
             </div>
         </header>
 
         <div class="wrapper">
             <aside class="sidebar">
                 <div class="panel">
-                    <b style="color:var(--neon-blue)">TURMAS</b>
-                    <div id="class-tabs" style="margin: 10px 0; display:flex; flex-wrap:wrap; gap:5px;"></div>
-                    <input type="text" id="add-c" placeholder="+ Nova Turma (Enter)" onkeypress="if(event.key==='Enter') addC()">
-                </div>
-                
-                <div id="stu-panel" style="display:none;">
-                    <div class="panel">
-                        <b style="color:var(--neon-blue)">ALUNOS</b>
-                        <textarea id="names-area" placeholder="Cole a lista de nomes aqui..." style="height:70px; font-size: 12px;"></textarea>
-                        <button class="btn-cosmic" onclick="impS()">IMPORTAR ALUNOS</button>
+                    <div class="panel-header">📚 TURMAS E MATÉRIAS</div>
+                    <div class="panel-content">
+                        <div id="class-tabs" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;"></div>
+                        <input type="text" id="new-class" placeholder="+ Nova Turma">
+                        <div id="subj-tabs" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:10px;"></div>
+                        <input type="text" id="new-subj" placeholder="+ Nova Matéria">
                     </div>
-                    <div id="stu-list"></div>
                 </div>
+
+                <div class="panel">
+                    <div class="panel-header">📋 CRITÉRIOS AVALIATIVOS</div>
+                    <div class="panel-content">
+                        <div id="crit-list" style="margin-bottom:10px;"></div>
+                        <input type="text" id="new-crit" placeholder="Ex: Maquete, Prova...">
+                        <button class="btn-action" onclick="addCrit()">ADICIONAR CRITÉRIO</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">👥 ALUNOS</div>
+                    <div class="panel-content">
+                        <textarea id="names-in" placeholder="Cole os nomes..."></textarea>
+                        <button class="btn-action" onclick="impS()">IMPORTAR LISTA</button>
+                    </div>
+                </div>
+                <div id="stu-display"></div>
             </aside>
 
             <main class="track-container">
-                <div id="bim-nav" style="margin-bottom:15px; display:flex; gap:10px;"></div>
-                <div class="track" id="track">
-                    <div class="rainbow-bridge"></div>
-                </div>
+                <div id="bim-tabs" style="display:flex; gap:10px; margin-bottom:15px;"></div>
+                <div class="track" id="track"></div>
             </main>
         </div>
     </div>
 
     <script>
-        let d = JSON.parse(localStorage.getItem('bl124')) || { cs: [], ci: -1, b: 1 };
-        const ems = ['🚀','🧬','🧪','⚛️','🪐','🛸','👾','🌻'];
-
-        function save() { localStorage.setItem('bl124', JSON.stringify(d)); }
-
-        function startApp() {
-            let s = document.getElementById('sch-in').value || localStorage.getItem('sch') || 'Sua Escola';
-            let t = document.getElementById('tea-in').value || localStorage.getItem('tea') || 'Sua Professora';
-            localStorage.setItem('sch', s); localStorage.setItem('tea', t);
-            document.getElementById('txt-sch').innerText = s;
-            document.getElementById('txt-tea').innerText = t;
-            document.getElementById('splash-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'flex';
-            render();
+        // Sistema de Animação
+        const bg = document.getElementById('bg-anim');
+        for(let i=0; i<5; i++) { 
+            let c = document.createElement('div'); c.className='cloud'; 
+            c.style.width=(100+Math.random()*200)+'px'; c.style.height='80px'; 
+            c.style.top=(Math.random()*80)+'%'; c.style.animationDelay=(i*3)+'s'; bg.appendChild(c);
         }
 
-        function editH(type) {
-            let val = prompt("Editar:", type === 'sch' ? localStorage.getItem('sch') : localStorage.getItem('tea'));
-            if(val) { localStorage.setItem(type, val); document.getElementById(type === 'sch' ? 'txt-sch' : 'txt-tea').innerText = val; }
-        }
+        let d = JSON.parse(localStorage.getItem('biolab_v125')) || { cs: [], ci: -1, bi: 1 };
 
-        function addC() {
-            let n = document.getElementById('add-c').value;
-            if(n) { d.cs.push({n:n, st:[]}); d.ci = d.cs.length-1; document.getElementById('add-c').value=''; save(); render(); }
+        function save() { localStorage.setItem('biolab_v125', JSON.stringify(d)); }
+
+        function addCrit() {
+            let n = document.getElementById('new-crit').value;
+            if(n && d.ci > -1) { d.cs[d.ci].crits.push({n:n, val:10}); document.getElementById('new-crit').value=''; save(); render(); }
         }
 
         function impS() {
-            let raw = document.getElementById('names-area').value.split('\n').filter(x=>x.trim());
-            raw.forEach(n => d.cs[d.ci].st.push({n:n.trim(), e:ems[Math.floor(Math.random()*ems.length)], sc:{}}));
+            let n = document.getElementById('names-in').value.split('\n').filter(x=>x.trim());
+            n.forEach(x => d.cs[d.ci].st.push({n:x.trim(), sc:{}}));
             d.cs[d.ci].st.sort((a,b)=>a.n.localeCompare(b.n));
-            document.getElementById('names-area').value=''; save(); render();
+            document.getElementById('names-in').value=''; save(); render();
         }
 
         function render() {
             const c = d.cs[d.ci];
-            document.getElementById('class-tabs').innerHTML = d.cs.map((x,i)=>`<button onclick="d.ci=${i};render()" style="background:${i===d.ci?'var(--neon-blue)':'rgba(255,255,255,0.1)'}; color:${i===d.ci?'black':'white'}; border:none; padding:5px 10px; border-radius:8px; cursor:pointer;">${x.n}</button>`).join('');
+            document.getElementById('class-tabs').innerHTML = d.cs.map((x,i)=>`<button onclick="d.ci=${i};render()" style="background:${i===d.ci?'#3498db':'#fff'};color:${i===d.ci?'#fff':'#000'}">${x.n}</button>`).join('');
             
             if(c) {
-                document.getElementById('stu-panel').style.display='block';
-                document.getElementById('bim-nav').innerHTML = [1,2,3,4].map(x=>`<button onclick="d.b=${x};render()" style="background:${x===d.b?'white':'none'}; color:${x===d.b?'black':'white'}; border:1px solid white; padding:5px 15px; border-radius:20px; cursor:pointer; font-weight:bold;">${x}º BIMESTRE</button>`).join('');
+                document.getElementById('subj-tabs').innerHTML = c.ss.map((s,i)=>`<button onclick="d.cs[d.ci].si=${i};render()" style="background:${i===c.si?'#2ecc71':'#eee'}">${s}</button>`).join('');
+                document.getElementById('bim-tabs').innerHTML = [1,2,3,4].map(b => `<button onclick="d.bi=${b};render()" style="padding:10px; border-radius:10px; background:${b===d.bi?'#e91e63':'#fff'}; color:${b===d.bi?'#fff':'#000'}">${b}º BIMESTRE</button>`).join('');
                 
-                document.getElementById('stu-list').innerHTML = c.st.map((s,si) => {
-                    let k = `b${d.b}`, ch = '';
-                    for(let j=0; j<10; j++) {
-                        let checked = (s.sc[k] && s.sc[k].includes(j)) ? 'checked' : '';
-                        ch += `<input type="checkbox" ${checked} onclick="tgl(${si},'${k}',${j})">`;
-                    }
-                    return `<div class="student-item"><span class="editable" onclick="edS(${si})">${s.n}</span> <span onclick="delS(${si})" style="color:red; float:right; cursor:pointer;">✖</span><div class="check-grid">${ch}</div></div>`;
+                document.getElementById('crit-list').innerHTML = c.crits.map((x,i)=>`<div>${x.n} <span onclick="d.cs[d.ci].crits.splice(${i},1);render();save()" style="color:red;cursor:pointer">✖</span></div>`).join('');
+
+                document.getElementById('stu-display').innerHTML = c.st.map((s,si) => {
+                    let k = `${c.si}_${d.bi}`, html = `<div class="student-card"><b class="editable" onclick="edS(${si})">${s.n}</b>`;
+                    c.crits.forEach(cr => {
+                        let val = s.sc[`${k}_${cr.n}`] || 0;
+                        html += `<div style="display:flex;justify-content:space-between;margin-top:5px;"><small>${cr.n}:</small> <input type="number" value="${val}" onchange="updateSc(${si},'${k}_${cr.n}',this.value)" style="width:50px"></div>`;
+                    });
+                    return html + `</div>`;
                 }).join('');
 
-                let t = document.getElementById('track');
-                t.querySelectorAll('.lane').forEach(l=>l.remove());
+                let track = document.getElementById('track'); track.innerHTML = '';
                 c.st.forEach(s => {
-                    let sc = (s.sc[`b${d.b}`] || []).length;
+                    let total = 0; c.crits.forEach(cr => total += parseFloat(s.sc[`${c.si}_${d.bi}_${cr.n}`] || 0));
+                    let avg = total / (c.crits.length || 1);
                     let lane = document.createElement('div'); lane.className='lane';
-                    lane.innerHTML = `<div class="runner" style="left:${sc*8.5}%"><div class="runner-tag">${s.n} | ${sc}</div><div style="font-size:35px; filter:drop-shadow(0 0 10px white);">${s.e}</div></div>`;
-                    t.appendChild(lane);
+                    lane.innerHTML = `<div class="runner" style="left:${avg*8}%"><div class="runner-tag">${s.n} | ${avg.toFixed(1)}</div><div style="font-size:30px">🔬</div></div>`;
+                    track.appendChild(lane);
                 });
             }
         }
 
-        function tgl(si, k, v) {
-            let s = d.cs[d.ci].st[si];
-            if(!s.sc[k]) s.sc[k] = [];
-            let i = s.sc[k].indexOf(v);
-            if(i > -1) s.sc[k].splice(i,1); else s.sc[k].push(v);
-            save(); render();
-        }
+        function updateSc(si, k, v) { d.cs[d.ci].st[si].sc[k] = v; save(); render(); }
+        function edS(i) { let n = prompt("Nome:", d.cs[d.ci].st[i].n); if(n) { d.cs[d.ci].st[i].n=n; save(); render(); } }
 
-        function delS(i) { if(confirm("Excluir aluno?")) { d.cs[d.ci].st.splice(i,1); save(); render(); } }
-        function edS(i) { let n = prompt("Nome do Aluno:", d.cs[d.ci].st[i].n); if(n) { d.cs[d.ci].st[i].n = n; save(); render(); } }
+        document.getElementById('new-class').onkeypress = (e) => { if(e.key==='Enter') { d.cs.push({n:e.target.value, ss:['Ciências'], si:0, crits:[], st:[]}); d.ci=d.cs.length-1; e.target.value=''; save(); render(); } };
+        document.getElementById('new-subj').onkeypress = (e) => { if(e.key==='Enter') { d.cs[d.ci].ss.push(e.target.value); e.target.value=''; save(); render(); } };
 
-        function exportX() {
-            let c = d.cs[d.ci];
-            let csv = `Escola: ${localStorage.getItem('sch')}\nTurma: ${c.n}\nBimestre: ${d.b}\n\nAluno;Atividades\n`;
-            c.st.forEach(s => csv += `${s.n};${(s.sc[`b${d.b}`] || []).length}\n`);
+        function exportToExcel() {
+            let c = d.cs[d.ci]; if(!c) return;
+            let csv = `Aluno;Materia;Bimestre;Media\n`;
+            c.st.forEach(s => {
+                let total = 0; c.crits.forEach(cr => total += parseFloat(s.sc[`${c.si}_${d.bi}_${cr.n}`] || 0));
+                csv += `${s.n};${c.ss[c.si]};${d.bi}º Bim;${(total/(c.crits.length||1)).toFixed(1)}\n`;
+            });
             let b = new Blob(["\ufeff"+csv], {type:'text/csv'});
-            let a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`BioLab_${c.n}.csv`; a.click();
+            let a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`Relatorio_${c.n}.csv`; a.click();
         }
 
-        window.onload = () => { if(localStorage.getItem('sch')) startApp(); };
+        window.onload = render;
     </script>
 </body>
 </html>
