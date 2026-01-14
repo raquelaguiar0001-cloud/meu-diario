@@ -154,4 +154,81 @@
 
         function addC() { let v = document.getElementById('in-cl').value; if(v){ state.cs.push({n:v, ss:['Ciências'], si:0, totA: 10, crits:[], st:[]}); state.ci=state.cs.length-1; document.getElementById('in-cl').value=''; save(); render(); }}
         function addS() { let v = document.getElementById('in-sb').value; if(v && state.ci>-1){ state.cs[state.ci].ss.push(v); document.getElementById('in-sb').value=''; save(); render(); }}
-        function delSubj(idx) { if(confirm("Excluir matéria?")){ state.cs[state.ci].
+        function delSubj(idx) { if(confirm("Excluir matéria?")){ state.cs[state.ci].ss.splice(idx,1); save(); render(); }}
+
+        function impSt() {
+            let names = document.getElementById('in-nm').value.split('\n').filter(x=>x.trim());
+            if(state.ci===-1) return alert("Crie uma turma!");
+            names.forEach(n => state.cs[state.ci].st.push({n:n.trim(), sc:{}, open: false, em: emojis[Math.floor(Math.random()*emojis.length)]}));
+            state.cs[state.ci].st.sort((a,b)=>a.n.localeCompare(b.n));
+            document.getElementById('in-nm').value=''; save(); render();
+        }
+
+        function getScore(stu) {
+            const c = state.cs[state.ci]; if(!c) return 0;
+            let sum = 0, kA = `${c.si}_${state.b}_ativ`;
+            sum += c.totA > 0 ? ((stu.sc[kA] || []).length / c.totA) * 10 : 0;
+            c.crits.forEach(cr => sum += parseFloat(stu.sc[`${c.si}_${state.b}_${cr.n}`] || 0));
+            return sum / (c.crits.length + 1);
+        }
+
+        function render() {
+            const c = state.cs[state.ci];
+            document.getElementById('disp-sch').innerText = localStorage.getItem('sch') || 'ESCOLA';
+            document.getElementById('disp-tea').innerText = localStorage.getItem('tea') || 'PROFESSOR(A)';
+            
+            if(c) {
+                document.getElementById('count-label').innerText = `LISTA DE ALUNOS (${c.st.length}):`;
+                document.getElementById('info-turma').innerText = `TURMA: ${c.n}`;
+                document.getElementById('info-materia').innerText = `MATÉRIA: ${c.ss[c.si] || '---'}`;
+                
+                document.getElementById('class-tabs').innerHTML = state.cs.map((x,i)=>`<button onclick="state.ci=${i};render();save();" style="background:${i===state.ci?'#00d2ff':'#eee'}">${x.n}</button>`).join('');
+                document.getElementById('subj-tabs').innerHTML = c.ss.map((s,i)=>`<div style="background:${i===c.si?'#2ecc71':'#eee'}"><span onclick="state.cs[state.ci].si=${i};render();save();">${s}</span> <span onclick="delSubj(${i})" style="color:red; cursor:pointer">✖</span></div>`).join('');
+                
+                document.getElementById('stu-list').innerHTML = c.st.map((stu, si) => {
+                    let kA = `${c.si}_${state.b}_ativ`, chs = '';
+                    for(let i=0; i<c.totA; i++) chs += `<div class="check-box ${(stu.sc[kA]||[]).includes(i)?'active':''}" onclick="tglA(${si},'${kA}',${i})">${i+1}</div>`;
+                    return `<div class="student-card ${stu.open?'open':''}">
+                        <div class="card-header" onclick="toggleStu(${si})">${stu.n}</div>
+                        <div class="card-body"><div class="check-grid">${chs}</div></div>
+                    </div>`;
+                }).join('');
+
+                const track = document.getElementById('track'); track.innerHTML = '';
+                const z = state.zoom || 45;
+                c.st.forEach((stu, si) => {
+                    let g = getScore(stu);
+                    let lane = document.createElement('div'); lane.className='lane'; lane.style.height = z + 'px';
+                    lane.innerHTML = `<div class="runner" style="left:${g*8.5}%"><div class="runner-emoji" style="font-size:${z*0.7}px">${stu.em}</div><div class="runner-tag" style="font-size:${z*0.3}px">${stu.n} | ${g.toFixed(1)}</div></div>`;
+                    track.appendChild(lane);
+                });
+            }
+            document.getElementById('bim-tabs').innerHTML = [1,2,3,4].map(b=>`<button onclick="state.b=${b};render();save();" style="background:${b===state.b?'#00d2ff':'white'}">${b}º BIM</button>`).join('');
+        }
+
+        function tglA(si, k, idx) {
+            if(!state.cs[state.ci].st[si].sc[k]) state.cs[state.ci].st[si].sc[k] = [];
+            let a = state.cs[state.ci].st[si].sc[k]; let p = a.indexOf(idx);
+            if(p > -1) a.splice(p, 1); else a.push(idx);
+            save(); render();
+        }
+        function toggleStu(si) { state.cs[state.ci].st[si].open = !state.cs[state.ci].st[si].open; render(); }
+        function addCrit() { let v = document.getElementById('in-cr').value; if(v){ state.cs[state.ci].crits.push({n:v}); save(); render(); }}
+        function upTot(v) { state.cs[state.ci].totA = parseInt(v); save(); render(); }
+        function createBackup() { 
+            const blob = new Blob([JSON.stringify({state, sch:localStorage.getItem('sch'), tea:localStorage.getItem('tea')})], {type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Backup_BioLab.json`; a.click();
+        }
+        function restoreBackup(e) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { const data = JSON.parse(ev.target.result); state = data.state; save(); render(); alert("OK!"); };
+            reader.readAsText(e.target.files[0]);
+        }
+        function exportExcel() {
+            let csv = `ALUNO;NOTA\n` + state.cs[state.ci].st.map(s => `${s.n};${getScore(s).toFixed(1)}`).join('\n');
+            let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(["\ufeff"+csv], {type:'text/csv'})); a.download = `Notas.csv`; a.click();
+        }
+        window.onload = render;
+    </script>
+</body>
+</html>
