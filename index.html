@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v15.4 - Layout Compacto</title>
+    <title>Bio-Lab Master v15.5 - Auto-Emoji</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         
@@ -29,28 +29,23 @@
 
         .wrapper { display: flex; flex: 1; overflow: hidden; padding: 15px; gap: 15px; }
 
-        /* SIDEBAR OTIMIZADA */
         .sidebar { width: 380px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
         
-        /* ESTILO DOS CARDS MINIMIZÁVEIS */
         .panel { background: white; border-radius: 12px; border: 2px solid #00d2ff; overflow: hidden; transition: all 0.3s ease; }
         .panel-header { 
             padding: 10px 15px; background: #f0faff; cursor: pointer; 
             display: flex; justify-content: space-between; align-items: center;
             font-weight: 700; font-size: 0.75rem; color: #0088aa; text-transform: uppercase;
         }
-        .panel-header:hover { background: #e0f5ff; }
         .panel.closed .panel-content { display: none; }
         .panel-content { padding: 12px; border-top: 1px solid #e0f0f0; background: #fff; }
 
-        /* LISTA DE ALUNOS (CARDS COMPACTOS) */
         .students-scroll { flex: 1; overflow-y: auto; padding-right: 5px; margin-top: 5px; }
         .student-card { background: white; border-radius: 10px; margin-bottom: 6px; border: 2px solid #eee; }
         .card-header { padding: 8px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; }
         .card-body { padding: 12px; border-top: 1px solid #eee; background: #fcfcfc; display: none; }
         .student-card.open .card-body { display: block; border-left: 6px solid #2ecc71; }
 
-        /* PISTA DE CORRIDA */
         .track-container { flex: 1; background: #0b131a; border-radius: 30px; padding: 15px; position: relative; border: 6px solid #fff; box-shadow: inset 0 0 50px #000; overflow-y: auto; }
         .lane { height: 52px; border-bottom: 1px dashed rgba(255,255,255,0.08); position: relative; display: flex; align-items: center; }
         .runner { position: absolute; transition: 2s cubic-bezier(0.17, 0.67, 0.83, 0.67); text-align: center; }
@@ -134,7 +129,7 @@
 
     <script>
         let state = JSON.parse(localStorage.getItem('biolab_v15')) || { cs: [], ci: -1, b: 1 };
-        const emojis = ['🚀','⚛️','🧬','🧪','🪐','🛸','👾','🌿','🦠','🔭','👨‍🔬','👩‍🔬','🌍','☀️','💎'];
+        const emojis = ['🚀','⚛️','🧬','🧪','🪐','🛸','👾','🌿','🦠','🔭','👨‍🔬','👩‍🔬','🌍','☀️','💎','🧪','🌡️','🧬','🛸','🛰️'];
 
         function save() { localStorage.setItem('biolab_v15', JSON.stringify(state)); }
         
@@ -155,7 +150,11 @@
         function impSt() {
             let names = document.getElementById('in-nm').value.split('\n').filter(x=>x.trim());
             if(state.ci===-1) return alert("Crie uma turma primeiro!");
-            names.forEach(n => state.cs[state.ci].st.push({n:n.trim(), sc:{}, open: false, em: '🚀'}));
+            names.forEach(n => {
+                // SELECIONA EMOJI ALEATÓRIO NA IMPORTAÇÃO
+                let randomEm = emojis[Math.floor(Math.random() * emojis.length)];
+                state.cs[state.ci].st.push({n:n.trim(), sc:{}, open: false, em: randomEm});
+            });
             state.cs[state.ci].st.sort((a,b)=>a.n.localeCompare(b.n));
             document.getElementById('in-nm').value=''; save(); render();
         }
