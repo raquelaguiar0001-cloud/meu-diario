@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v15.9 - Alta Densidade</title>
+    <title>Bio-Lab Master v16.0 - Modo Cinema</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         
@@ -16,7 +16,7 @@
             font-size: 19px; color: #1a2a3a;
         }
 
-        #main-app { display: flex; flex-direction: column; height: 100vh; }
+        #main-app { display: flex; flex-direction: column; height: 100vh; transition: 0.3s; }
 
         header {
             background: white; padding: 10px 25px; display: flex; justify-content: space-between;
@@ -29,7 +29,7 @@
 
         .wrapper { display: flex; flex: 1; overflow: hidden; padding: 15px; gap: 15px; }
 
-        .sidebar { width: 380px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+        .sidebar { width: 380px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; transition: 0.3s; }
         
         .panel { background: white; border-radius: 12px; border: 2px solid #00d2ff; overflow: hidden; transition: all 0.3s ease; }
         .panel-header { 
@@ -46,21 +46,29 @@
         .card-body { padding: 12px; border-top: 1px solid #eee; background: #fcfcfc; display: none; }
         .student-card.open .card-body { display: block; border-left: 6px solid #2ecc71; }
 
-        .track-container { flex: 1; background: #0b131a; border-radius: 30px; padding: 15px; position: relative; border: 6px solid #fff; box-shadow: inset 0 0 50px #000; overflow-y: auto; }
+        /* PISTA E TELA CHEIA */
+        .track-container { 
+            flex: 1; background: #0b131a; border-radius: 30px; padding: 15px; 
+            position: relative; border: 6px solid #fff; box-shadow: inset 0 0 50px #000; 
+            overflow-y: auto; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         
-        /* RAIA REDUZIDA PARA TURMAS GRANDES */
-        .lane { height: 38px; border-bottom: 1px dashed rgba(255,255,255,0.08); position: relative; display: flex; align-items: center; }
+        body.fullscreen-mode .sidebar, body.fullscreen-mode header { display: none !important; }
+        body.fullscreen-mode .wrapper { padding: 0; gap: 0; }
+        body.fullscreen-mode .track-container { border-radius: 0; border: none; }
+
+        .lane { border-bottom: 1px dashed rgba(255,255,255,0.08); position: relative; display: flex; align-items: center; transition: height 0.2s; }
         .runner { position: absolute; transition: 2s cubic-bezier(0.17, 0.67, 0.83, 0.67); text-align: center; display: flex; align-items: center; gap: 8px; }
         
         .runner-tag { 
             background: white; padding: 1px 6px; border-radius: 5px; 
-            font-size: 9px; font-weight: 900; 
+            font-size: 0.8em; font-weight: 900; 
             border: 2px solid #00d2ff; white-space: nowrap; 
         }
         .score-bad { color: #e74c3c; } 
         .score-good { color: #27ae60; } 
 
-        .runner-emoji { font-size: 22px; cursor: pointer; filter: drop-shadow(0 0 5px #00d2ff); line-height: 1; }
+        .runner-emoji { cursor: pointer; filter: drop-shadow(0 0 5px #00d2ff); line-height: 1; }
 
         .check-grid { display: flex; flex-wrap: wrap; gap: 4px; }
         .check-box { width: 32px; height: 32px; border: 2px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; background: white; font-weight: bold; }
@@ -69,35 +77,27 @@
         .indicator { background: #1a2a3a; color: #00d2ff; padding: 8px 15px; border-radius: 10px; font-family: 'Orbitron'; font-size: 0.7rem; border: 2px solid #00d2ff; }
         .backup-bar { background: #f8f9fa; padding: 6px; border-radius: 10px; display: flex; gap: 6px; border: 1px dashed #ccc; align-items: center; }
         .btn-mini { padding: 3px 6px; font-size: 10px; cursor: pointer; border-radius: 4px; border: 1px solid #ddd; font-weight: bold; background: white; }
+
+        /* CONTROLES FLUTUANTES */
+        #fs-controls { 
+            position: fixed; top: 20px; right: 20px; display: none; 
+            background: rgba(255,255,255,0.9); padding: 10px; 
+            border-radius: 15px; border: 3px solid #00d2ff; z-index: 1000; gap: 10px;
+        }
+        body.fullscreen-mode #fs-controls { display: flex; }
     </style>
 </head>
 <body>
+
+    <div id="fs-controls">
+        <button onclick="changeZoom(5)" class="btn-mini" style="font-size: 18px; padding: 5px 15px;">+</button>
+        <button onclick="changeZoom(-5)" class="btn-mini" style="font-size: 18px; padding: 5px 15px;">-</button>
+        <button onclick="toggleFS()" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">SAIR</button>
+    </div>
 
     <div id="main-app">
         <header>
             <div class="indicator" id="info-turma">TURMA: ---</div>
             <div class="identity">
                 <div class="school-info" onclick="editL('sch')"><span id="disp-sch">NOME DA ESCOLA</span></div>
-                <div style="font-size: 0.8rem; font-weight: bold; color: #7f8c8d;" onclick="editL('tea')">PROF(A): <span id="disp-tea">SEU NOME</span></div>
-            </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <div class="indicator" id="info-materia">MATÉRIA: ---</div>
-                <button onclick="exportExcel()" style="background:#27ae60; border:none; color:white; padding:10px 15px; border-radius:10px; font-weight:bold; cursor:pointer; font-size: 0.8rem;">📊 EXCEL</button>
-            </div>
-        </header>
-
-        <div class="wrapper">
-            <aside class="sidebar">
-                <div class="backup-bar">
-                    <span style="font-size: 9px; font-weight: bold;">💾 BACKUP:</span>
-                    <button class="btn-mini" onclick="createBackup()">CRIAR</button>
-                    <button class="btn-mini" onclick="document.getElementById('fileIn').click()">RESTAURAR</button>
-                    <input type="file" id="fileIn" style="display:none" onchange="restoreBackup(event)">
-                </div>
-
-                <div class="panel closed" id="p-turmas">
-                    <div class="panel-header" onclick="toggleP('p-turmas')">🏫 TURMAS E MATÉRIAS <span id="icon-p-turmas">▼</span></div>
-                    <div class="panel-content">
-                        <strong>Turmas:</strong>
-                        <div id="class-tabs" style="display:flex; gap:4px; flex-wrap:wrap; margin:8px 0;"></div>
-                        <input type="text" id="in-cl" placeholder
+                <div style="font-size: 0.8rem; font-weight: bold; color: #7f
