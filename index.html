@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v15.1 - Safe Edition</title>
+    <title>Bio-Lab Master v15.2 - Edição Ativada</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         
@@ -58,13 +58,15 @@
         .indicator { background: #1a2a3a; color: #00d2ff; padding: 10px 20px; border-radius: 15px; font-family: 'Orbitron'; font-size: 0.8rem; border: 2px solid #00d2ff; }
         
         .backup-bar { background: #f8f9fa; padding: 10px; border-radius: 12px; display: flex; gap: 10px; border: 1px dashed #ccc; margin-bottom: 10px; }
-        .btn-mini { padding: 5px 10px; font-size: 12px; cursor: pointer; border-radius: 5px; border: 1px solid #ddd; }
+        .btn-mini { padding: 5px 10px; font-size: 12px; cursor: pointer; border-radius: 5px; border: 1px solid #ddd; font-weight: bold; }
+        .btn-edit { background: #f1c40f; color: #000; border: none; margin-right: 5px; }
+        .btn-del { background: #e74c3c; color: #fff; border: none; }
     </style>
 </head>
 <body>
 
     <div class="science-icon" style="top:10%; left:5%; font-size: 80px;">🧬</div>
-    <div class="science-icon" style="top:50%; right:5%; font-size: 60px; animation-delay: 2s;">⚛️</div>
+    <div class="science-icon" style="top:50%; right:5%; font-size: 60px;">⚛️</div>
 
     <div id="main-app">
         <header>
@@ -82,9 +84,9 @@
         <div class="wrapper">
             <aside class="sidebar">
                 <div class="backup-bar">
-                    <span style="font-size: 12px; font-weight: bold; align-self: center;">💾 SEGURANÇA:</span>
-                    <button class="btn-mini" onclick="createBackup()" title="Salvar tudo num arquivo">CRIAR BACKUP</button>
-                    <button class="btn-mini" onclick="document.getElementById('fileIn').click()" title="Restaurar de um arquivo">RESTAURAR</button>
+                    <span style="font-size: 12px; font-weight: bold;">💾 BACKUP:</span>
+                    <button class="btn-mini" onclick="createBackup()">CRIAR</button>
+                    <button class="btn-mini" onclick="document.getElementById('fileIn').click()">RESTAURAR</button>
                     <input type="file" id="fileIn" style="display:none" onchange="restoreBackup(event)">
                 </div>
 
@@ -152,6 +154,22 @@
             document.getElementById('in-nm').value=''; save(); render();
         }
 
+        function editStudentName(si) {
+            let oldN = state.cs[state.ci].st[si].n;
+            let newN = prompt("Editar nome do aluno:", oldN);
+            if(newN && newN.trim() !== "") {
+                state.cs[state.ci].st[si].n = newN.trim();
+                save(); render();
+            }
+        }
+
+        function delStu(si) { 
+            if(confirm("Deseja mesmo excluir este aluno? Esta ação não pode ser desfeita.")) { 
+                state.cs[state.ci].st.splice(si,1); 
+                save(); render(); 
+            }
+        }
+
         function getScore(stu) {
             const c = state.cs[state.ci]; if(!c) return 0;
             let sum = 0; let kA = `${c.si}_${state.b}_ativ`;
@@ -183,6 +201,10 @@
                     return `<div class="student-card ${stu.open?'open':''}">
                         <div class="card-header" onclick="toggleStu(${si})"><b>${stu.n}</b> <span>${stu.open?'▲':'▼'}</span></div>
                         <div class="card-body">
+                            <div style="margin-bottom:15px; display:flex; gap:10px;">
+                                <button class="btn-mini btn-edit" onclick="editStudentName(${si})">✎ EDITAR NOME</button>
+                                <button class="btn-mini btn-del" onclick="delStu(${si})">🗑 EXCLUIR ALUNO</button>
+                            </div>
                             <div class="check-grid">${chs}</div>
                             ${c.crits.map(cr => {
                                 let k = `${c.si}_${state.b}_${cr.n}`;
@@ -217,7 +239,6 @@
             save(); render();
         }
 
-        // FUNÇÕES DE BACKUP
         function createBackup() {
             const data = { state: state, sch: localStorage.getItem('sch'), tea: localStorage.getItem('tea') };
             const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
