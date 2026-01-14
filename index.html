@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v15.0 - Ciência Viva</title>
+    <title>Bio-Lab Master v15.1 - Safe Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         
@@ -16,7 +16,6 @@
             font-size: 22px; color: #1a2a3a;
         }
 
-        /* Elementos de fundo dinâmicos */
         .science-icon { position: absolute; opacity: 0.1; z-index: -1; animation: float 10s infinite ease-in-out; }
         @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(10deg); } }
 
@@ -32,44 +31,40 @@
 
         .wrapper { display: flex; flex: 1; overflow: hidden; padding: 20px; gap: 20px; }
 
-        /* Sidebar com Scroll */
         .sidebar { width: 450px; display: flex; flex-direction: column; gap: 12px; }
         .controls-top { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
 
-        /* Painéis Maximizar/Minimizar */
         .panel { background: white; border-radius: 15px; border: 2px solid #00d2ff; overflow: hidden; }
         .panel-header { padding: 12px 20px; background: #f0faff; cursor: pointer; display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; }
         .panel.closed .panel-content { display: none; }
         .panel-content { padding: 15px; border-top: 1px solid #e0f0f0; }
 
-        /* Cards de Alunos (Compactos) */
         .students-scroll { flex: 1; overflow-y: auto; padding-right: 10px; }
         .student-card { background: white; border-radius: 12px; margin-bottom: 10px; border: 2px solid #eee; transition: 0.3s; }
         .card-header { padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
         .card-body { padding: 15px; border-top: 1px solid #eee; background: #fcfcfc; display: none; }
         .student-card.open .card-body { display: block; border-left: 10px solid #2ecc71; }
 
-        /* Pista de Corrida */
         .track-container { flex: 1; background: #0b131a; border-radius: 40px; padding: 30px; position: relative; border: 8px solid #fff; box-shadow: inset 0 0 50px #000; }
         .lane { height: 100px; border-bottom: 1px dashed rgba(255,255,255,0.1); position: relative; display: flex; align-items: center; }
         .runner { position: absolute; transition: 2s cubic-bezier(0.17, 0.67, 0.83, 0.67); text-align: center; }
         .runner-tag { background: white; color: black; padding: 4px 12px; border-radius: 10px; font-size: 14px; font-weight: 900; margin-bottom: 5px; border: 3px solid #00d2ff; }
         .runner-emoji { font-size: 50px; cursor: pointer; filter: drop-shadow(0 0 10px #00d2ff); }
 
-        /* Caixinhas de Vistos Numeradas */
         .check-grid { display: flex; flex-wrap: wrap; gap: 8px; }
         .check-box { width: 45px; height: 45px; border: 2px solid #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; background: white; font-weight: bold; }
         .check-box.active { background: #2ecc71; color: white; border-color: #27ae60; box-shadow: 0 0 15px rgba(46,204,113,0.5); }
 
-        .btn-sci { padding: 10px; border-radius: 10px; border: none; background: #00d2ff; color: white; font-weight: bold; cursor: pointer; font-family: 'Orbitron'; font-size: 0.7rem; }
         .indicator { background: #1a2a3a; color: #00d2ff; padding: 10px 20px; border-radius: 15px; font-family: 'Orbitron'; font-size: 0.8rem; border: 2px solid #00d2ff; }
+        
+        .backup-bar { background: #f8f9fa; padding: 10px; border-radius: 12px; display: flex; gap: 10px; border: 1px dashed #ccc; margin-bottom: 10px; }
+        .btn-mini { padding: 5px 10px; font-size: 12px; cursor: pointer; border-radius: 5px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
     <div class="science-icon" style="top:10%; left:5%; font-size: 80px;">🧬</div>
     <div class="science-icon" style="top:50%; right:5%; font-size: 60px; animation-delay: 2s;">⚛️</div>
-    <div class="science-icon" style="top:80%; left:40%; font-size: 70px; animation-delay: 4s;">🧪</div>
 
     <div id="main-app">
         <header>
@@ -86,6 +81,13 @@
 
         <div class="wrapper">
             <aside class="sidebar">
+                <div class="backup-bar">
+                    <span style="font-size: 12px; font-weight: bold; align-self: center;">💾 SEGURANÇA:</span>
+                    <button class="btn-mini" onclick="createBackup()" title="Salvar tudo num arquivo">CRIAR BACKUP</button>
+                    <button class="btn-mini" onclick="document.getElementById('fileIn').click()" title="Restaurar de um arquivo">RESTAURAR</button>
+                    <input type="file" id="fileIn" style="display:none" onchange="restoreBackup(event)">
+                </div>
+
                 <div class="controls-top">
                     <div class="panel closed" id="p-turmas">
                         <div class="panel-header" onclick="toggleP('p-turmas')">🏫 TURMAS E MATÉRIAS <span>▼</span></div>
@@ -106,7 +108,7 @@
                             Vistos no Bimestre: <input type="number" id="tot-at" value="10" onchange="upTot(this.value)" style="width:60px; font-size:20px;">
                             <div id="crit-list" style="margin:10px 0; font-size:16px;"></div>
                             <input type="text" id="in-cr" placeholder="Ex: Prova, Comportamento" style="width:100%; padding:8px; border-radius:8px;">
-                            <button class="btn-sci" onclick="addCrit()" style="width:100%; margin-top:5px;">+ ADICIONAR CRITÉRIO</button>
+                            <button onclick="addCrit()" style="width:100%; margin-top:5px; background:#00d2ff; border:none; color:white; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">+ ADICIONAR</button>
                         </div>
                     </div>
 
@@ -168,7 +170,6 @@
                 document.getElementById('info-turma').innerText = `TURMA: ${c.n}`;
                 document.getElementById('info-materia').innerText = `MATÉRIA: ${c.ss[c.si]}`;
                 document.getElementById('tot-at').value = c.totA;
-                
                 document.getElementById('class-tabs').innerHTML = state.cs.map((x,i)=>`<button onclick="state.ci=${i};render();save();" style="padding:8px; border-radius:8px; border:none; background:${i===state.ci?'#00d2ff':'#eee'}; color:${i===state.ci?'white':'#333'}; cursor:pointer; font-weight:bold;">${x.n}</button>`).join('');
                 document.getElementById('subj-tabs').innerHTML = c.ss.map((s,i)=>`<button onclick="state.cs[state.ci].si=${i};render();save();" style="padding:8px; border-radius:8px; border:none; background:${i===c.si?'#2ecc71':'#eee'}; color:white; cursor:pointer; font-weight:bold;">${s}</button>`).join('');
                 document.getElementById('crit-list').innerHTML = c.crits.map((cr,i)=>`<div style="margin-bottom:5px;">🧪 ${cr.n} <span onclick="state.cs[state.ci].crits.splice(${i},1);save();render()" style="color:red; cursor:pointer">✖</span></div>`).join('');
@@ -180,17 +181,13 @@
                         chs += `<div class="check-box ${ok?'active':''}" onclick="tglA(${si},'${kA}',${i})">${i+1}</div>`;
                     }
                     return `<div class="student-card ${stu.open?'open':''}">
-                        <div class="card-header" onclick="toggleStu(${si})">
-                            <span><b>${stu.n}</b></span>
-                            <span>${stu.open?'▲':'▼'}</span>
-                        </div>
+                        <div class="card-header" onclick="toggleStu(${si})"><b>${stu.n}</b> <span>${stu.open?'▲':'▼'}</span></div>
                         <div class="card-body">
                             <div class="check-grid">${chs}</div>
                             ${c.crits.map(cr => {
                                 let k = `${c.si}_${state.b}_${cr.n}`;
                                 return `<div style="margin-top:15px; font-weight:bold;">${cr.n}: <input type="number" value="${stu.sc[k]||0}" onchange="upSc(${si},'${k}',this.value)" style="width:70px; font-size:20px; border-radius:8px; border:1px solid #ccc; padding:5px;"></div>`;
                             }).join('')}
-                            <button onclick="delStu(${si})" style="margin-top:15px; color:red; border:none; background:none; cursor:pointer; font-size:14px;">Excluir Aluno</button>
                         </div>
                     </div>`;
                 }).join('');
@@ -199,10 +196,7 @@
                 c.st.forEach((stu, si) => {
                     let g = getScore(stu);
                     let lane = document.createElement('div'); lane.className='lane';
-                    lane.innerHTML = `<div class="runner" style="left:${g*8.5}%">
-                        <div class="runner-tag">${stu.n} | ${g.toFixed(1)}</div>
-                        <div class="runner-emoji" onclick="nextEm(${si})">${stu.em || '🚀'}</div>
-                    </div>`;
+                    lane.innerHTML = `<div class="runner" style="left:${g*8.5}%"><div class="runner-tag">${stu.n} | ${g.toFixed(1)}</div><div class="runner-emoji" onclick="nextEm(${si})">${stu.em || '🚀'}</div></div>`;
                     track.appendChild(lane);
                 });
             }
@@ -222,7 +216,22 @@
             state.cs[state.ci].st[si].em = emojis[(cur + 1) % emojis.length];
             save(); render();
         }
-        function delStu(si) { if(confirm("Deseja mesmo excluir este aluno?")) { state.cs[state.ci].st.splice(si,1); save(); render(); }}
+
+        // FUNÇÕES DE BACKUP
+        function createBackup() {
+            const data = { state: state, sch: localStorage.getItem('sch'), tea: localStorage.getItem('tea') };
+            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Backup_BioLab_${new Date().toLocaleDateString()}.json`; a.click();
+        }
+        function restoreBackup(e) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const data = JSON.parse(ev.target.result);
+                state = data.state; localStorage.setItem('sch', data.sch); localStorage.setItem('tea', data.tea);
+                save(); render(); alert("Backup restaurado com sucesso!");
+            };
+            reader.readAsText(e.target.files[0]);
+        }
 
         function exportExcel() {
             const c = state.cs[state.ci]; if(!c) return;
