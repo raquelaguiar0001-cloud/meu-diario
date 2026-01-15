@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v16.8 - Painéis Inteligentes</title>
+    <title>Bio-Lab Master v16.9 - Foco em Matérias</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -16,6 +16,13 @@
         .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .school-info h1 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 24px; cursor: pointer; }
         .school-info p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; }
+
+        /* Destaque para Turma e Matéria */
+        .info-badge { 
+            font-weight: bold; background: #1a2a3a; color: #00d2ff; 
+            padding: 8px 15px; border-radius: 10px; font-size: 14px;
+            border: 2px solid #00d2ff; display: inline-block;
+        }
 
         .nav-container { 
             background: white; border-radius: 15px; display: flex; padding: 5px; gap: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -35,7 +42,6 @@
             border: 6px solid #fff; overflow-y: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Sub-paineis Animados */
         .config-overlay {
             position: fixed; top: 145px; left: 50%; transform: translateX(-50%);
             background: white; border-radius: 15px; padding: 20px; width: 90%; max-width: 600px;
@@ -73,8 +79,9 @@
     <header id="top-panel">
         <div class="header-top">
             <div class="school-info">
-                <h1 onclick="editL('sch')" id="disp-sch">ESCOLA</h1>
-                <p>PROFESSOR: <span onclick="editL('tea')" id="disp-tea">NOME</span> | <span id="info-turma">TURMA: ---</span></p>
+                <h1 onclick="editL('sch')" id="disp-sch">UNIDADE ESCOLAR</h1>
+                <p>PROFESSOR(A): <span onclick="editL('tea')" id="disp-tea">NOME</span></p>
+                <div class="info-badge" id="info-header">TURMA: --- | MATÉRIA: ---</div>
             </div>
             <div style="display:flex; gap:10px;">
                 <button onclick="createBackup()" class="btn-action">💾 BACKUP</button>
@@ -108,7 +115,7 @@
 
     <div id="p-crit" class="config-overlay">
         <h3>Critérios de Avaliação</h3>
-        Vistos do Bimestre (Total): <input type="number" id="tot-at" value="10" onchange="upTot(this.value)" style="width:60px; padding:5px;"><br><br>
+        Vistos do Bimestre: <input type="number" id="tot-at" value="10" onchange="upTot(this.value)" style="width:60px; padding:5px;"><br><br>
         <strong>Critérios Extras:</strong>
         <div id="crit-list" style="margin:10px 0;"></div>
         <input type="text" id="in-cr" placeholder="Nome do Critério..." style="width:70%; padding:8px;">
@@ -146,14 +153,9 @@
             const panel = document.getElementById(id);
             const btn = document.getElementById('btn-' + id);
             const isVisible = panel.style.display === 'block';
-            
             document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            if(!isVisible) {
-                panel.style.display = 'block';
-                btn.classList.add('active');
-            }
+            if(!isVisible) { panel.style.display = 'block'; btn.classList.add('active'); }
         }
 
         function addC() { let v=document.getElementById('in-cl').value; if(v){ state.cs.push({n:v, ss:['Ciências'], si:0, totA:10, crits:[], st:[]}); state.ci=state.cs.length-1; document.getElementById('in-cl').value=''; save(); render(); }}
@@ -193,8 +195,10 @@
             const c = state.cs[state.ci];
             document.getElementById('disp-sch').innerText = localStorage.getItem('sch') || 'UNIDADE ESCOLAR';
             document.getElementById('disp-tea').innerText = localStorage.getItem('tea') || 'PROFESSOR';
+            
             if(c) {
-                document.getElementById('info-turma').innerText = `TURMA: ${c.n}`;
+                const materiaAtual = c.ss[c.si] || "---";
+                document.getElementById('info-header').innerText = `TURMA: ${c.n} | MATÉRIA: ${materiaAtual}`;
                 document.getElementById('count-st').innerText = c.st.length;
                 document.getElementById('class-tabs').innerHTML = state.cs.map((x,i)=>`<button onclick="state.ci=${i};render();save();" class="btn-action" style="background:${i===state.ci?'#e91e63':'#eee'}; color:${i===state.ci?'white':'black'}">${x.n}</button>`).join('');
                 document.getElementById('subj-tabs').innerHTML = c.ss.map((s,i)=>`<button onclick="state.cs[state.ci].si=${i};render();save();" class="btn-action" style="background:${i===c.si?'#2ecc71':'#eee'}; color:${i===c.si?'white':'black'}">${s}</button>`).join('');
