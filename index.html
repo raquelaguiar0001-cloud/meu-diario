@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v16.9 - Foco em Matérias</title>
+    <title>Bio-Lab Master v17.0 - Gestão de Matérias</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -17,7 +17,6 @@
         .school-info h1 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 24px; cursor: pointer; }
         .school-info p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; }
 
-        /* Destaque para Turma e Matéria */
         .info-badge { 
             font-weight: bold; background: #1a2a3a; color: #00d2ff; 
             padding: 8px 15px; border-radius: 10px; font-size: 14px;
@@ -159,9 +158,27 @@
         }
 
         function addC() { let v=document.getElementById('in-cl').value; if(v){ state.cs.push({n:v, ss:['Ciências'], si:0, totA:10, crits:[], st:[]}); state.ci=state.cs.length-1; document.getElementById('in-cl').value=''; save(); render(); }}
-        function addS() { let v=document.getElementById('in-sb').value; if(v && state.ci>-1){ state.cs[state.ci].ss.push(v); document.getElementById('in-sb').value=''; save(); render(); }}
+        
+        function addS() { 
+            let v=document.getElementById('in-sb').value; 
+            if(v && state.ci>-1){ 
+                state.cs[state.ci].ss.push(v); 
+                document.getElementById('in-sb').value=''; 
+                save(); render(); 
+            }
+        }
+
+        function delS(idx) {
+            if(confirm("Excluir esta matéria e todas as notas dela?")) {
+                state.cs[state.ci].ss.splice(idx, 1);
+                state.cs[state.ci].si = 0; // Volta para a primeira matéria
+                save(); render();
+            }
+        }
+
         function addCrit() { let v=document.getElementById('in-cr').value; if(v && state.ci>-1){ state.cs[state.ci].crits.push({n:v}); document.getElementById('in-cr').value=''; save(); render(); }}
         function upTot(v) { if(state.ci>-1){ state.cs[state.ci].totA=parseInt(v); save(); render(); } }
+        
         function impSt() {
             let names = document.getElementById('in-nm').value.split('\n').filter(x=>x.trim());
             if(state.ci===-1) return alert("Selecione uma turma!");
@@ -200,9 +217,19 @@
                 const materiaAtual = c.ss[c.si] || "---";
                 document.getElementById('info-header').innerText = `TURMA: ${c.n} | MATÉRIA: ${materiaAtual}`;
                 document.getElementById('count-st').innerText = c.st.length;
+                
                 document.getElementById('class-tabs').innerHTML = state.cs.map((x,i)=>`<button onclick="state.ci=${i};render();save();" class="btn-action" style="background:${i===state.ci?'#e91e63':'#eee'}; color:${i===state.ci?'white':'black'}">${x.n}</button>`).join('');
-                document.getElementById('subj-tabs').innerHTML = c.ss.map((s,i)=>`<button onclick="state.cs[state.ci].si=${i};render();save();" class="btn-action" style="background:${i===c.si?'#2ecc71':'#eee'}; color:${i===c.si?'white':'black'}">${s}</button>`).join('');
+                
+                // Renderização das matérias com botão de excluir
+                document.getElementById('subj-tabs').innerHTML = c.ss.map((s,i)=>`
+                    <div style="display:flex; align-items:center; background:${i===c.si?'#2ecc71':'#eee'}; border-radius:8px; padding-right:5px;">
+                        <button onclick="state.cs[state.ci].si=${i};render();save();" class="btn-action" style="background:transparent; border:none; color:${i===c.si?'white':'black'}">${s}</button>
+                        <span onclick="delS(${i})" style="color:${i===c.si?'#fff':'red'}; cursor:pointer; font-size:12px; font-weight:bold; margin-left:5px;">✖</span>
+                    </div>
+                `).join('');
+
                 document.getElementById('crit-list').innerHTML = c.crits.map((cr,i)=>`<div style="padding:5px; border-bottom:1px solid #eee;">🧪 ${cr.n} <span onclick="state.cs[state.ci].crits.splice(${i},1);save();render();" style="color:red;cursor:pointer;float:right">✖</span></div>`).join('');
+                
                 document.getElementById('stu-list').innerHTML = c.st.map((stu, si) => {
                     let kA = `${c.si}_${state.b}_ativ`, chs = '';
                     for(let i=0; i<c.totA; i++) chs += `<div class="check-box ${(stu.sc[kA]||[]).includes(i)?'active':''}" onclick="tglA(${si},'${kA}',${i})">${i+1}</div>`;
