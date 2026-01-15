@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master v17.2 - Notas Coloridas</title>
+    <title>Bio-Lab Master v17.3 - Cores na Pista</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔬</text></svg>">
 
@@ -51,7 +51,7 @@
             border: 3px solid #e91e63;
         }
 
-        /* Estilo das Notas Dinâmicas */
+        /* Cores das Notas */
         .score-good { color: #2ecc71 !important; font-weight: bold; }
         .score-bad { color: #e74c3c !important; font-weight: bold; }
 
@@ -252,12 +252,17 @@
                         </div>
                     </div>`;
                 }).join('');
+
                 const track = document.getElementById('track'); track.innerHTML = '';
                 const z = state.zoom || 45;
                 c.st.forEach((stu) => {
                     let g = getScore(stu);
+                    let colorClass = g >= 7 ? 'score-good' : 'score-bad';
                     let lane = document.createElement('div'); lane.className='lane'; lane.style.height = z + 'px';
-                    lane.innerHTML = `<div class="runner" style="left:${g*8.8}%"><div style="font-size:${z*0.7}px; cursor:pointer;" onclick="nextEm(this)">${stu.em}</div><div class="runner-tag">${stu.n} | ${g.toFixed(1)}</div></div>`;
+                    lane.innerHTML = `<div class="runner" style="left:${g*8.8}%">
+                        <div style="font-size:${z*0.7}px; cursor:pointer;" onclick="nextEm(this)">${stu.em}</div>
+                        <div class="runner-tag">${stu.n} | <span class="${colorClass}">${g.toFixed(1)}</span></div>
+                    </div>`;
                     track.appendChild(lane);
                 });
             }
