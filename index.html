@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio-Lab Master 🧬</title>
+    <title>UE. NATIVIDADE MARINHO</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔬</text></svg>">
 
@@ -288,7 +288,6 @@
         function createBackup() { let b=new Blob([JSON.stringify({state,sch:localStorage.getItem('sch'),tea:localStorage.getItem('tea')})],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Biolab_Backup.json'; a.click(); }
         function restoreBackup(e) { let r=new FileReader(); r.onload=(ev)=>{ state=JSON.parse(ev.target.result).state; save(); render(); alert("Backup Restaurado!"); }; r.readAsText(e.target.files[0]); }
         
-        // EXPORTAÇÃO EXCEL ATUALIZADA (QUADRO GERAL)
         function exportExcel() { 
             let csv = "ALUNO;1º BIM;2º BIM;3º BIM;4º BIM;MEDIA ANUAL\n";
             state.cs[state.ci].st.forEach(s => {
