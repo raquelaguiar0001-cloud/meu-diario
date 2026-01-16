@@ -71,7 +71,7 @@
                 <button onclick="createBackup()" style="padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">💾 BACKUP</button>
                 <button onclick="document.getElementById('fileIn').click()" style="padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">📂 ABRIR</button>
                 <input type="file" id="fileIn" style="display:none" onchange="restoreBackup(event)">
-                <button onclick="exportExcel()" style="background:#fff; color:#e91e63; padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">📊 EXCEL GERAL</button>
+                <button onclick="exportExcel()" style="background:#fff; color:#e91e63; padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">📊 EXCEL POR MATÉRIA</button>
             </div>
         </div>
         <nav class="nav-container">
@@ -225,29 +225,31 @@
         function restoreBackup(e) { let r=new FileReader(); r.onload=(ev)=>{ state=JSON.parse(ev.target.result).state; save(); render(); alert("Backup Restaurado!"); }; r.readAsText(e.target.files[0]); }
         function nextEm(el) { el.innerText = emojis[Math.floor(Math.random()*emojis.length)]; }
 
-        // NOVA FUNÇÃO DE EXCEL GERAL (TODAS AS MATÉRIAS)
+        // EXCEL ORGANIZADO COM TABELAS SEPARADAS VERTICALMENTE
         function exportExcel() { 
             const c = state.cs[state.ci]; if(!c) return;
             
-            let header = "\ufeffALUNO";
-            c.ss.forEach(m => {
-                header += `;${m} (1B);${m} (2B);${m} (3B);${m} (4B);${m} (ANUAL)`;
-            });
-            header += "\n";
+            let finalCsv = "\ufeff"; // BOM para UTF-8
 
-            let rows = "";
-            c.st.forEach(s => { 
-                let line = `${s.n}`;
-                c.ss.forEach((m, mIdx) => {
+            c.ss.forEach((m, mIdx) => {
+                // Título da Matéria
+                finalCsv += `MATÉRIA: ${m.toUpperCase()}\n`;
+                // Cabeçalho da Tabela
+                finalCsv += "ALUNO;1º BIM;2º BIM;3º BIM;4º BIM;MÉDIA ANUAL\n";
+
+                // Linhas dos Alunos para esta matéria
+                c.st.forEach(s => {
                     let b1 = getScore(s, 1, mIdx), b2 = getScore(s, 2, mIdx), b3 = getScore(s, 3, mIdx), b4 = getScore(s, 4, mIdx);
                     let anu = (b1 + b2 + b3 + b4) / 4;
-                    line += `;${b1.toFixed(1)};${b2.toFixed(1)};${b3.toFixed(1)};${b4.toFixed(1)};${anu.toFixed(1)}`;
+                    finalCsv += `${s.n};${b1.toFixed(1)};${b2.toFixed(1)};${b3.toFixed(1)};${b4.toFixed(1)};${anu.toFixed(1)}\n`;
                 });
-                rows += line + "\n";
+
+                // Espaço vazio após cada tabela de matéria
+                finalCsv += "\n\n";
             });
 
-            let blob = new Blob([header + rows], {type: 'text/csv;charset=utf-8;'});
-            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Relatorio_Geral_${c.n}.csv`; a.click(); 
+            let blob = new Blob([finalCsv], {type: 'text/csv;charset=utf-8;'});
+            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Relatorio_Turma_${c.n}.csv`; a.click(); 
         }
         window.onload = load;
     </script>
