@@ -8,7 +8,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
         
-        /* ANIMAÇÕES EXCLUSIVAS */
+        /* ANIMAÇÕES */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         @keyframes glow { 0% { box-shadow: 0 0 5px rgba(0,210,255,0.2); } 50% { box-shadow: 0 0 15px rgba(0,210,255,0.5); } 100% { box-shadow: 0 0 5px rgba(0,210,255,0.2); } }
@@ -38,9 +38,6 @@
         .config-overlay { position: fixed; top: 145px; left: 50%; transform: translateX(-50%); background: white; border-radius: 15px; padding: 20px; width: 90%; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 100; display: none; border: 3px solid #e91e63; }
 
         .student-card { background: white; border-radius: 12px; margin-bottom: 10px; border: 2px solid #eee; padding: 12px; transition: 0.3s; }
-        .student-card:hover { transform: scale(1.02); border-color: #e91e63; }
-        
-        /* MÉDIAS NO CARD */
         .card-averages { display: flex; justify-content: space-between; margin: 8px 0; font-size: 12px; background: #f0f0f0; padding: 5px; border-radius: 8px; }
 
         .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(28px, 1fr)); gap: 4px; margin: 8px 0; }
@@ -74,7 +71,7 @@
                 <button onclick="createBackup()" style="padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">💾 BACKUP</button>
                 <button onclick="document.getElementById('fileIn').click()" style="padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">📂 ABRIR</button>
                 <input type="file" id="fileIn" style="display:none" onchange="restoreBackup(event)">
-                <button onclick="exportExcel()" style="background:#fff; color:#e91e63; padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">📊 EXCEL</button>
+                <button onclick="exportExcel()" style="background:#fff; color:#e91e63; padding:6px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:bold;">📊 EXCEL GERAL</button>
             </div>
         </div>
         <nav class="nav-container">
@@ -163,9 +160,9 @@
             return isNaN(final) ? 0 : final;
         }
 
-        function getAnual(stu) {
+        function getAnual(stu, sIndex = state.cs[state.ci].si) {
             let s = 0;
-            for(let i=1; i<=4; i++) s += getScore(stu, i);
+            for(let i=1; i<=4; i++) s += getScore(stu, i, sIndex);
             return s / 4;
         }
 
@@ -227,16 +224,30 @@
         function createBackup() { let b=new Blob([JSON.stringify({state,sch:localStorage.getItem('sch'),tea:localStorage.getItem('tea')})],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Biolab_Backup.json'; a.click(); }
         function restoreBackup(e) { let r=new FileReader(); r.onload=(ev)=>{ state=JSON.parse(ev.target.result).state; save(); render(); alert("Backup Restaurado!"); }; r.readAsText(e.target.files[0]); }
         function nextEm(el) { el.innerText = emojis[Math.floor(Math.random()*emojis.length)]; }
+
+        // NOVA FUNÇÃO DE EXCEL GERAL (TODAS AS MATÉRIAS)
         function exportExcel() { 
             const c = state.cs[state.ci]; if(!c) return;
-            let csv = "\ufeffALUNO;1B;2B;3B;4B;ANUAL\n";
-            c.st.forEach(s => { 
-                let b1 = getScore(s,1), b2 = getScore(s,2), b3 = getScore(s,3), b4 = getScore(s,4);
-                let anu = (b1+b2+b3+b4)/4;
-                csv += `${s.n};${b1.toFixed(1)};${b2.toFixed(1)};${b3.toFixed(1)};${b4.toFixed(1)};${anu.toFixed(1)}\n`; 
+            
+            let header = "\ufeffALUNO";
+            c.ss.forEach(m => {
+                header += `;${m} (1B);${m} (2B);${m} (3B);${m} (4B);${m} (ANUAL)`;
             });
-            let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Notas_${c.n}.csv`; a.click(); 
+            header += "\n";
+
+            let rows = "";
+            c.st.forEach(s => { 
+                let line = `${s.n}`;
+                c.ss.forEach((m, mIdx) => {
+                    let b1 = getScore(s, 1, mIdx), b2 = getScore(s, 2, mIdx), b3 = getScore(s, 3, mIdx), b4 = getScore(s, 4, mIdx);
+                    let anu = (b1 + b2 + b3 + b4) / 4;
+                    line += `;${b1.toFixed(1)};${b2.toFixed(1)};${b3.toFixed(1)};${b4.toFixed(1)};${anu.toFixed(1)}`;
+                });
+                rows += line + "\n";
+            });
+
+            let blob = new Blob([header + rows], {type: 'text/csv;charset=utf-8;'});
+            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Relatorio_Geral_${c.n}.csv`; a.click(); 
         }
         window.onload = load;
     </script>
