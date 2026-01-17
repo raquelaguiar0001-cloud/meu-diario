@@ -18,6 +18,11 @@
             padding: 10px 15px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0;
         }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Ajuste do Ícone/Emoji no Header */
+        .user-badge { display: flex; align-items: center; gap: 10px; }
+        .user-emoji { font-size: 24px; background: rgba(255,255,255,0.2); padding: 5px; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+
         .info-fixa { background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 20px; margin-top: 8px; display: flex; gap: 15px; font-weight: bold; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); }
         
         .nav-container { background: white; border-radius: 10px; display: flex; padding: 3px; gap: 3px; margin-top: 8px; flex-shrink: 0; }
@@ -68,9 +73,12 @@
 
 <header onclick="event.stopPropagation()">
     <div class="header-top">
-        <div>
-            <h1 style="margin:0; font-family:'Orbitron'; font-size:16px;">NATIVIDADE MARINHO</h1>
-            <p style="margin:0; font-size:11px;">PROF(A) RAQUEL AGUIAR</p>
+        <div class="user-badge">
+            <div class="user-emoji">🧬</div>
+            <div>
+                <h1 style="margin:0; font-family:'Orbitron'; font-size:16px;">NATIVIDADE MARINHO</h1>
+                <p style="margin:0; font-size:11px;">PROF(A) RAQUEL AGUIAR</p>
+            </div>
         </div>
         <div style="display:flex; gap:5px;">
             <button class="btn-action" style="background:#27ae60; color:white;" onclick="exportarExcel()">📊 EXCEL</button>
