@@ -13,13 +13,12 @@
         * { box-sizing: border-box; }
         body { font-family: 'Fredoka', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; background: #fdf2f9; overflow: hidden; }
         
-        /* CABEÇALHO COM LETREIRO */
         header { 
             background: linear-gradient(90deg, #9b4dca 0%, #e91e63 100%); 
             padding: 10px 15px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10;
         }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
-        .info-fixa { background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 20px; margin-top: 8px; display: flex; gap: 15px; font-weight: bold; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); }
+        .info-fixa { background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 20px; margin-top: 8px; display: flex; gap: 15px; font-weight: bold; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); }
         
         .nav-container { background: white; border-radius: 10px; display: flex; padding: 3px; gap: 3px; margin-top: 8px; }
         .nav-btn { flex: 1; padding: 10px 5px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-weight: bold; color: #555; font-size: 10px; text-transform: uppercase; }
@@ -28,21 +27,19 @@
         .main-content { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; }
         .students-area { width: 330px; display: flex; flex-direction: column; overflow-y: auto; }
         
-        /* PISTA DE CORRIDA REFORÇADA */
-        .track-container { flex: 1; background: #1a2a3a; border-radius: 20px; padding: 10px; border: 5px solid #2c3e50; overflow-y: auto; position: relative; display: block !important; }
-        .lane { border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; height: 50px; display: flex; align-items: center; width: 100%; }
+        .track-container { flex: 1; background: #1a2a3a; border-radius: 20px; padding: 10px; border: 5px solid #2c3e50; overflow-y: auto; position: relative; }
+        .lane { border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; height: 55px; display: flex; align-items: center; width: 100%; }
         .runner { position: absolute; transition: 2s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 8px; z-index: 5; }
         .runner span { font-size: 28px; }
-        .runner-tag { background: white; padding: 2px 8px; border-radius: 5px; font-weight: bold; font-size: 10px; border: 2px solid #e91e63; color: #333; white-space: nowrap; }
+        .runner-tag { background: white; padding: 2px 8px; border-radius: 5px; font-weight: bold; font-size: 10px; border: 2px solid #e91e63; color: #333; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        /* CARDS E BOTÕES */
         .student-card { background: white; border-radius: 12px; margin-bottom: 8px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .check-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .check-box { width: 30px; height: 30px; border: 2px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; font-weight: bold; }
+        .check-box { width: 30px; height: 30px; border: 2px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; font-weight: bold; font-size: 11px; }
         .check-box.active { background: #2ecc71; color: white; border-color: #27ae60; }
 
-        .config-overlay { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: white; border-radius: 15px; padding: 20px; width: 90%; max-width: 450px; box-shadow: 0 10px 50px rgba(0,0,0,0.6); z-index: 100; display: none; border: 3px solid #e91e63; }
-        .item-del { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .config-overlay { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; border-radius: 15px; padding: 20px; width: 90%; max-width: 450px; box-shadow: 0 10px 50px rgba(0,0,0,0.6); z-index: 100; display: none; border: 3px solid #e91e63; }
+        .item-del { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
         .btn-action { cursor: pointer; padding: 8px 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 11px; }
 
         #loading { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; }
@@ -50,7 +47,7 @@
 </head>
 <body onclick="fecharPaineis(event)">
 
-<div id="loading"><b>🧪 CARREGANDO DADOS...</b></div>
+<div id="loading"><b>🧪 SINCRONIZANDO BIOLAB...</b></div>
 
 <header onclick="event.stopPropagation()">
     <div class="header-top">
@@ -85,29 +82,31 @@
     <section class="track-container" id="track"></section>
 </main>
 
-<div id="p-turmas" class="config-overlay">
-    <h3>Selecionar Turma</h3>
-    <div id="class-list"></div>
+<div id="p-turmas" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Minhas Turmas</h3>
+    <div id="class-list" style="max-height: 200px; overflow-y: auto;"></div>
     <input type="text" id="in-cl" placeholder="+ Nova Turma e Enter" onkeypress="if(event.key==='Enter') addT()" style="width:100%; padding:10px; margin-top:10px;">
 </div>
 
-<div id="p-materias" class="config-overlay">
-    <h3>Selecionar Matéria</h3>
+<div id="p-materias" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Matérias</h3>
     <div id="subj-list"></div>
     <input type="text" id="in-sb" placeholder="+ Nova Matéria" onkeypress="if(event.key==='Enter') addM()" style="width:100%; padding:10px; margin-top:10px;">
 </div>
 
-<div id="p-crit" class="config-overlay">
-    <h3>Configurações de Nota</h3>
-    Vistos Totais: <input type="number" id="tot-at" onchange="setVistos(this.value)" style="width:60px;">
-    <div id="crit-list" style="margin:10px 0;"></div>
-    <input type="text" id="in-cr" placeholder="+ Novo Critério" onkeypress="if(event.key==='Enter') addC()" style="width:100%; padding:10px;">
+<div id="p-crit" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Critérios de Avaliação</h3>
+    <div style="background:#f0f0f0; padding:10px; border-radius:8px; margin-bottom:10px;">
+        Vistos Totais: <input type="number" id="tot-at" onchange="setVistos(this.value)" style="width:60px; padding:5px;">
+    </div>
+    <div id="crit-list"></div>
+    <input type="text" id="in-cr" placeholder="+ Novo Critério e Enter" onkeypress="if(event.key==='Enter') addC()" style="width:100%; padding:10px; margin-top:10px;">
 </div>
 
-<div id="p-alunos" class="config-overlay">
-    <h3>Gerenciar Alunos</h3>
+<div id="p-alunos" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Lista de Alunos</h3>
     <textarea id="in-nm" style="width:100%; height:80px;" placeholder="Cole os nomes aqui..."></textarea>
-    <button onclick="addStus()" style="width:100%; background:#e91e63; color:white; border:none; padding:10px; margin:5px 0; border-radius:8px; cursor:pointer; font-weight:bold;">ADICIONAR ALUNOS</button>
+    <button onclick="addStus()" style="width:100%; background:#e91e63; color:white; border:none; padding:10px; margin:5px 0; border-radius:8px; cursor:pointer; font-weight:bold;">SALVAR ALUNOS</button>
     <div id="stu-del-list" style="max-height: 150px; overflow-y: auto;"></div>
 </div>
 
@@ -125,13 +124,14 @@
     const db = firebase.database();
 
     let dados = { cs: [], ci: 0, b: 1 };
-    const emojis = ['🚀','🧬','🔬','🧪','🪐','🌿','🔭','👾','🛸'];
+    const emojis = ['🚀','🧬','🔬','🧪','🪐','🌿','🔭','👾','🛸','🌍','⚛️'];
 
     db.ref('biolab_v15').on('value', (snap) => {
         const val = snap.val();
         if(val) {
             dados = val;
             if(dados.ci === undefined) dados.ci = 0;
+            if(!dados.cs) dados.cs = [];
         }
         document.getElementById('loading').style.display = 'none';
         renderizar();
@@ -145,69 +145,105 @@
     }
     function fecharPaineis(e) { if(!e.target.closest('.config-overlay') && !e.target.closest('.nav-btn')) document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); }
 
-    function addT() { let v=document.getElementById('in-cl').value; if(v){ if(!dados.cs) dados.cs=[]; dados.cs.push({n:v, ss:['Ciências'], si:0, mCrits:{}, mTotA:{}, st:[]}); dados.ci=dados.cs.length-1; document.getElementById('in-cl').value=''; salvar(); }}
+    function addT() { let v=document.getElementById('in-cl').value; if(v){ dados.cs.push({n:v, ss:['Ciências'], si:0, mCrits:{}, mTotA:{}, st:[]}); dados.ci=dados.cs.length-1; document.getElementById('in-cl').value=''; salvar(); }}
     function addM() { let v=document.getElementById('in-sb').value; if(v && dados.ci>-1){ dados.cs[dados.ci].ss.push(v); document.getElementById('in-sb').value=''; salvar(); }}
-    function addC() { let v=document.getElementById('in-cr').value; const c=dados.cs[dados.ci]; if(v && c){ if(!c.mCrits) c.mCrits={}; if(!c.mCrits[c.si]) c.mCrits[c.si]=[]; c.mCrits[c.si].push({n:v}); document.getElementById('in-cr').value=''; salvar(); }}
-    function addStus() { let txt=document.getElementById('in-nm').value; let nomes=txt.split('\n').filter(x=>x.trim()); if(dados.ci>-1){ if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[]; nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojis[Math.floor(Math.random()*emojis.length)]})); dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); document.getElementById('in-nm').value=''; salvar(); }}
+    function addC() { 
+        let v=document.getElementById('in-cr').value; 
+        const c=dados.cs[dados.ci]; 
+        if(v && c){ 
+            if(!c.mCrits) c.mCrits = {};
+            if(!c.mCrits[c.si]) c.mCrits[c.si] = [];
+            c.mCrits[c.si].push({n: v});
+            document.getElementById('in-cr').value=''; 
+            salvar(); 
+        }
+    }
+    function addStus() { 
+        let txt=document.getElementById('in-nm').value; 
+        let nomes=txt.split('\n').filter(x=>x.trim()); 
+        if(dados.ci>-1){ 
+            if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[];
+            nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojis[Math.floor(Math.random()*emojis.length)]})); 
+            dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); 
+            document.getElementById('in-nm').value=''; 
+            salvar(); 
+        }
+    }
     function setVistos(v) { if(dados.ci>-1) { let c=dados.cs[dados.ci]; if(!c.mTotA) c.mTotA={}; c.mTotA[c.si] = parseInt(v); salvar(); } }
 
     function getNota(aluno, bim=dados.b, matIdx=dados.cs[dados.ci].si) {
         const c = dados.cs[dados.ci]; if(!c) return 0;
         let kA = `${matIdx}_${bim}_ativ`, totA = (c.mTotA && c.mTotA[matIdx]) ? c.mTotA[matIdx] : 10;
-        let notaVistos = ((aluno.sc[kA] || []).length / totA) * 10;
-        let notaCrits = 0; let crits = (c.mCrits && c.mCrits[matIdx]) ? c.mCrits[matIdx] : [];
-        crits.forEach(cr => notaCrits += parseFloat(aluno.sc[`${matIdx}_${bim}_${cr.n}`] || 0));
+        let notaVistos = ((aluno.sc && aluno.sc[kA] ? aluno.sc[kA] : []).length / totA) * 10;
+        let notaCrits = 0; 
+        let crits = (c.mCrits && c.mCrits[matIdx]) ? c.mCrits[matIdx] : [];
+        crits.forEach(cr => {
+            let val = (aluno.sc && aluno.sc[`${matIdx}_${bim}_${cr.n}`]) ? parseFloat(aluno.sc[`${matIdx}_${bim}_${cr.n}`]) : 0;
+            notaCrits += val;
+        });
         let res = (notaVistos + notaCrits) / (crits.length + 1);
         return isNaN(res) ? 0 : res;
     }
 
     function renderizar() {
         const c = (dados.cs && dados.cs[dados.ci]) ? dados.cs[dados.ci] : null;
-        
         if(!c) { 
-            document.getElementById('stu-list').innerHTML = "<p style='padding:20px'>Crie sua primeira turma!</p>"; 
-            document.getElementById('txt-turma').innerText = "TURMA: ---";
-            document.getElementById('txt-materia').innerText = "MATÉRIA: ---";
+            document.getElementById('stu-list').innerHTML = "<p style='padding:20px'>Crie uma turma para começar.</p>"; 
             return; 
         }
 
-        // Atualiza Letreiro
         document.getElementById('txt-turma').innerText = `TURMA: ${c.n}`;
         document.getElementById('txt-materia').innerText = `MATÉRIA: ${c.ss[c.si]}`;
 
-        // Painéis
-        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span onclick="if(confirm('Excluir?')){dados.cs.splice(${i},1);salvar()}">✖</span></div>`).join('');
-        document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="item-del"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; flex:1; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span onclick="c.ss.splice(${i},1);salvar()">✖</span></div>`).join('');
-        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="item-del"><span>${s.n}</span><span onclick="c.st.splice(${i},1);salvar()">✖</span></div>`).join('');
+        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span style="color:red; cursor:pointer;" onclick="if(confirm('Excluir?')){dados.cs.splice(${i},1);salvar()}">✖</span></div>`).join('');
+        document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="item-del"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; flex:1; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span style="color:red; cursor:pointer;" onclick="c.ss.splice(${i},1);salvar()">✖</span></div>`).join('');
+        
+        let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
+        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="item-del"><span>🧪 ${cr.n}</span><span style="color:red; cursor:pointer;" onclick="dados.cs[dados.ci].mCrits[dados.cs[dados.ci].si].splice(${i},1);salvar()">✖</span></div>`).join('');
+        
+        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="item-del"><span>${s.n}</span><span style="color:red; cursor:pointer;" onclick="c.st.splice(${i},1);salvar()">✖</span></div>`).join('');
         document.getElementById('tot-at').value = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
 
-        // Alunos e Pista
         document.getElementById('stu-list').innerHTML = (c.st || []).map((s, si) => {
             let kA = `${c.si}_${dados.b}_ativ`, chs = '', tot = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
-            for(let i=0; i<tot; i++) chs += `<div class="check-box ${(s.sc[kA]||[]).includes(i)?'active':''}" onclick="tglV(${si},'${kA}',${i})">${i+1}</div>`;
+            let checks = (s.sc && s.sc[kA]) ? s.sc[kA] : [];
+            for(let i=0; i<tot; i++) chs += `<div class="check-box ${checks.includes(i)?'active':''}" onclick="tglV(${si},'${kA}',${i})">${i+1}</div>`;
             let n = getNota(s);
-            let crs = (c.mCrits && c.mCrits[c.si] ? c.mCrits[c.si] : []).map(cr => {
+            let crsHTML = critsAtuais.map(cr => {
                 let k = `${c.si}_${dados.b}_${cr.n}`;
-                return `<div style="font-size:10px; display:flex; justify-content:space-between; margin-top:5px;">${cr.n} <input type="number" step="0.1" value="${s.sc[k]||0}" onchange="upNota(${si},'${k}',this.value)" style="width:40px;"></div>`;
+                let val = (s.sc && s.sc[k]) ? s.sc[k] : 0;
+                return `<div style="font-size:10px; display:flex; justify-content:space-between; margin-top:5px; background:#f9f9f9; padding:3px; border-radius:4px;">${cr.n} <input type="number" step="0.1" value="${val}" onchange="upNota(${si},'${k}',this.value)" style="width:40px; text-align:center;"></div>`;
             }).join('');
-            return `<div class="student-card"><b>${s.n}</b> | <span style="color:#e91e63">${n.toFixed(1)}</span><div class="check-grid">${chs}</div>${crs}</div>`;
+            return `<div class="student-card"><b>${s.n}</b> | <span style="color:#e91e63">Nota: ${n.toFixed(1)}</span><div class="check-grid">${chs}</div>${crsHTML}</div>`;
         }).join('');
 
         const track = document.getElementById('track'); track.innerHTML = '';
         (c.st || []).forEach(s => {
             let n = getNota(s);
             let lane = document.createElement('div'); lane.className = 'lane';
-            lane.innerHTML = `<div class="runner" style="left:${n*8.8}%"><span>${s.em}</span><div class="runner-tag">${s.n} | ${n.toFixed(1)}</div></div>`;
+            let emoji = s.em || '🚀';
+            lane.innerHTML = `<div class="runner" style="left:${n*8.8}%"><span>${emoji}</span><div class="runner-tag">${s.n} | ${n.toFixed(1)}</div></div>`;
             track.appendChild(lane);
         });
 
         document.getElementById('bim-tabs').innerHTML = [1,2,3,4].map(b=>`<button class="nav-btn ${b===dados.b?'active':''}" onclick="dados.b=${b};salvar()">${b}º BIM</button>`).join('');
     }
 
-    function tglV(si, k, idx) { let s=dados.cs[dados.ci].st[si]; if(!s.sc[k]) s.sc[k]=[]; let p=s.sc[k].indexOf(idx); if(p>-1) s.sc[k].splice(p,1); else s.sc[k].push(idx); salvar(); }
-    function upNota(si, k, v) { dados.cs[dados.ci].st[si].sc[k] = parseFloat(v); salvar(); }
+    function tglV(si, k, idx) { 
+        let s=dados.cs[dados.ci].st[si]; 
+        if(!s.sc) s.sc = {};
+        if(!s.sc[k]) s.sc[k]=[]; 
+        let p=s.sc[k].indexOf(idx); 
+        if(p>-1) s.sc[k].splice(p,1); else s.sc[k].push(idx); 
+        salvar(); 
+    }
+    function upNota(si, k, v) { 
+        if(!dados.cs[dados.ci].st[si].sc) dados.cs[dados.ci].st[si].sc = {};
+        dados.cs[dados.ci].st[si].sc[k] = parseFloat(v); 
+        salvar(); 
+    }
     function exportarBackup() { let b=new Blob([JSON.stringify(dados)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Biolab_Backup.json'; a.click(); }
-    function importarBackup(e) { let fr=new FileReader(); fr.onload=(ev)=>{ try { dados=JSON.parse(ev.target.result); salvar(); } catch(e){alert("Erro");} }; fr.readAsText(e.target.files[0]); }
+    function importarBackup(e) { let fr=new FileReader(); fr.onload=(ev)=>{ try { dados=JSON.parse(ev.target.result); salvar(); } catch(e){alert("Erro ao ler arquivo");} }; fr.readAsText(e.target.files[0]); }
     function exportarExcel() {
         const c = dados.cs[dados.ci]; if(!c) return;
         let csv = "\ufeffALUNO;1B;2B;3B;4B;MEDIA\n";
