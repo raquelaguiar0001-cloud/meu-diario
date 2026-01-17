@@ -43,6 +43,7 @@
 
         .config-overlay { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; border-radius: 15px; padding: 20px; width: 90%; max-width: 450px; box-shadow: 0 10px 50px rgba(0,0,0,0.6); z-index: 100; display: none; border: 3px solid #e91e63; }
         .item-del { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+        .del-x { color: #ff4757; cursor: pointer; font-weight: bold; font-size: 18px; padding: 5px 10px; }
         .btn-action { cursor: pointer; padding: 8px 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 11px; }
 
         #loading { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; }
@@ -198,13 +199,13 @@
         document.getElementById('txt-turma').innerText = `TURMA: ${c.n}`;
         document.getElementById('txt-materia').innerText = `MATÉRIA: ${c.ss[c.si]}`;
 
-        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span style="color:red; cursor:pointer;" onclick="if(confirm('Excluir?')){dados.cs.splice(${i},1);salvar()}">✖</span></div>`).join('');
-        document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="item-del"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; flex:1; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span style="color:red; cursor:pointer;" onclick="c.ss.splice(${i},1);salvar()">✖</span></div>`).join('');
+        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span class="del-x" onclick="if(confirm('Excluir turma?')){dados.cs.splice(${i},1); if(dados.ci>=dados.cs.length) dados.ci=0; salvar()}">✖</span></div>`).join('');
+        document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="item-del"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; flex:1; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span class="del-x" onclick="if(confirm('Excluir matéria?')){c.ss.splice(${i},1); c.si=0; salvar()}">✖</span></div>`).join('');
         
         let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
-        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="item-del"><span>🧪 ${cr.n}</span><span style="color:red; cursor:pointer;" onclick="dados.cs[dados.ci].mCrits[dados.cs[dados.ci].si].splice(${i},1);salvar()">✖</span></div>`).join('');
+        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="item-del"><span>🧪 ${cr.n}</span><span class="del-x" onclick="dados.cs[dados.ci].mCrits[dados.cs[dados.ci].si].splice(${i},1); salvar()">✖</span></div>`).join('');
         
-        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="item-del"><span>${s.n}</span><span style="color:red; cursor:pointer;" onclick="c.st.splice(${i},1);salvar()">✖</span></div>`).join('');
+        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="item-del"><span>${s.n}</span><span class="del-x" onclick="if(confirm('Excluir aluno?')){dados.cs[dados.ci].st.splice(${i},1); salvar()}">✖</span></div>`).join('');
         document.getElementById('tot-at').value = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
 
         document.getElementById('stu-list').innerHTML = (c.st || []).map((s, si) => {
