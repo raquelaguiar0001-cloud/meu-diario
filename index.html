@@ -10,98 +10,47 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Orbitron:wght@700&display=swap');
-        
         * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Fredoka', sans-serif; }
-        
-        body { 
-            margin: 0; height: 100vh; display: flex; flex-direction: column; 
-            background: #f0f2f5; overflow: hidden; 
-        }
-
-        header { 
-            background: #b01a6b; 
-            padding: 15px; color: white; border-bottom: 4px solid #8e1456;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10;
-        }
-
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: #f0f2f5; overflow: hidden; }
+        header { background: #b01a6b; padding: 15px; color: white; border-bottom: 4px solid #8e1456; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10; }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .school-title { font-family: 'Orbitron'; font-size: 20px; letter-spacing: 1px; }
-        .teacher-name { font-size: 12px; opacity: 0.9; font-weight: bold; }
-
-        .info-bar { 
-            background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 50px; 
-            display: inline-flex; gap: 20px; margin-top: 10px; font-size: 13px;
-        }
-
+        .info-bar { background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 50px; display: inline-flex; gap: 20px; margin-top: 10px; font-size: 13px; }
         .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; color: white; }
         .btn-excel { background: #217346; }
-        .btn-import { background: #ffc107; color: #000; }
         .btn-bk { background: #e91e63; }
-
-        .nav-bar { 
-            background: white; padding: 8px; display: flex; gap: 10px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); align-items: center;
-        }
+        .nav-bar { background: white; padding: 8px; display: flex; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); align-items: center; }
         .nav-item { flex: 1; border: none; background: none; padding: 10px; cursor: pointer; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; }
         .nav-item.active { color: #b01a6b; border-bottom: 3px solid #b01a6b; }
-
         .main-container { display: flex; flex: 1; padding: 15px; gap: 15px; overflow: hidden; }
-        
-        .student-list { width: 350px; overflow-y: auto; padding-right: 5px; }
+        .student-list { width: 350px; overflow-y: auto; }
         .student-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-left: 5px solid #b01a6b; }
-        
         .score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .student-name { font-weight: 700; font-size: 16px; color: #333; }
         .grade-badge { font-size: 18px; font-weight: 800; }
-
-        .vistos-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        .vistos-grid { display: flex; flex-wrap: wrap; gap: 5px; }
         .visto-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
         .visto-btn.checked { background: #b01a6b; color: white; border-color: #b01a6b; }
-
-        .track-area { 
-            flex: 1; background: #1a2634; border-radius: 20px; padding: 15px; 
-            position: relative; display: flex; flex-direction: column; overflow: hidden;
-        }
-        
-        /* ESTILO DA PISTA MAXIMIZADA */
+        .track-area { flex: 1; background: #1a2634; border-radius: 20px; padding: 15px; position: relative; display: flex; flex-direction: column; overflow: hidden; }
         .track-area.full { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999; border-radius: 0; }
-
+        .btn-lupa { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .lane { flex: 1; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; display: flex; align-items: center; }
-        .runner { position: absolute; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 10px; }
+        .runner { position: absolute; transition: 1.5s; display: flex; align-items: center; gap: 10px; }
         .runner-info { background: white; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; border: 1px solid #b01a6b; white-space: nowrap; }
-
-        /* NOVA LUPA DE ZOOM */
-        .btn-lupa { 
-            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); 
-            color: white; border: 1px solid rgba(255,255,255,0.3); width: 45px; height: 45px; 
-            border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 1000; 
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);
-        }
-        .btn-lupa:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
-
         .overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000; display: none; width: 90%; max-width: 400px; }
-        #loading { position: fixed; inset: 0; background: #b01a6b; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; font-family: 'Orbitron'; }
+        #loading { position: fixed; inset: 0; background: #b01a6b; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
     </style>
 </head>
 <body onclick="closeAll()">
 
-<div id="loading">
-    <div style="font-size: 30px; margin-bottom: 10px;">🧬</div>
-    <div>UE. NATIVIDADE MARINHO</div>
-    <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">CARREGANDO DADOS...</div>
-</div>
+<div id="loading">🧬 UE. NATIVIDADE MARINHO<br>CARREGANDO DADOS...</div>
 
 <header onclick="event.stopPropagation()">
     <div class="header-top">
-        <div>
-            <div class="school-title">UE. NATIVIDADE MARINHO</div>
-            <div class="teacher-name">PROF(A) RAQUEL AGUIAR</div>
-        </div>
+        <div class="school-title">UE. NATIVIDADE MARINHO</div>
         <div style="display:flex; gap:10px;">
             <button class="btn-top btn-excel" onclick="exportExcel()">📊 EXCEL</button>
-            <button class="btn-top btn-import" onclick="document.getElementById('fileIn').click()">📂 ABRIR</button>
             <button class="btn-top btn-bk" onclick="exportBackup()">💾 BK</button>
-            <input type="file" id="fileIn" style="display:none" onchange="importBackup(event)">
         </div>
     </div>
     <div class="info-bar">
@@ -114,9 +63,7 @@
     <button class="nav-item" onclick="openPanel('p-turmas')">🎓 TURMAS</button>
     <button class="nav-item" onclick="openPanel('p-mats')">📚 MATÉRIAS</button>
     <button class="nav-item" onclick="openPanel('p-alunos')">👥 ALUNOS</button>
-    <button class="nav-item" onclick="openPanel('p-crits')">📋 CRITÉRIOS</button>
-    <div style="flex:1"></div>
-    <div id="bim-selector" style="display:flex; gap:5px;"></div>
+    <div id="bim-selector" style="display:flex; gap:5px; margin-left:auto;"></div>
 </nav>
 
 <main class="main-container">
@@ -129,29 +76,22 @@
 
 <div id="p-turmas" class="overlay" onclick="event.stopPropagation()">
     <h3>Turmas</h3><div id="list-turmas"></div>
-    <input type="text" id="in-turma" placeholder="+ Nova Turma" style="width:100%; padding:10px; margin-top:10px;" onkeypress="if(event.key==='Enter') addT()">
+    <input type="text" id="in-turma" placeholder="+ Nova Turma" onkeypress="if(event.key==='Enter') addT()">
 </div>
 
 <div id="p-mats" class="overlay" onclick="event.stopPropagation()">
     <h3>Matérias</h3><div id="list-mats"></div>
-    <input type="text" id="in-mat" placeholder="+ Nova Matéria" style="width:100%; padding:10px; margin-top:10px;" onkeypress="if(event.key==='Enter') addM()">
+    <input type="text" id="in-mat" placeholder="+ Nova Matéria" onkeypress="if(event.key==='Enter') addM()">
 </div>
 
 <div id="p-alunos" class="overlay" onclick="event.stopPropagation()">
     <h3>Alunos</h3>
-    <textarea id="in-alunos" placeholder="Cole os nomes..." style="width:100%; height:100px;"></textarea>
-    <button onclick="addS()" style="width:100%; background:#b01a6b; color:white; border:none; padding:10px; margin-top:10px; border-radius:5px;">SALVAR</button>
-    <div id="list-alunos-del" style="margin-top:10px; max-height:150px; overflow-y:auto;"></div>
-</div>
-
-<div id="p-crits" class="overlay" onclick="event.stopPropagation()">
-    <h3>Critérios</h3>
-    <p>Qtd. Vistos: <input type="number" id="qtd-v" onchange="upV(this.value)" style="width:50px;"></p>
-    <div id="list-crits"></div>
-    <input type="text" id="in-crit" placeholder="+ Novo Critério" style="width:100%; padding:10px; margin-top:10px;" onkeypress="if(event.key==='Enter') addC()">
+    <textarea id="in-alunos" placeholder="Cole os nomes..."></textarea>
+    <button onclick="addS()">SALVAR</button>
 </div>
 
 <script>
+    // CHAVES DO FIREBASE RECUPERADAS DAS SUAS IMAGENS
     const firebaseConfig = {
         apiKey: "AIzaSyCXIOrHsZbHXvOIGTk0HS8NOwVBvpmwrOo",
         authDomain: "ue-joao-tavares-da-costa.firebaseapp.com",
@@ -164,13 +104,17 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const NODE = 'biolab_natividade_marinho'; 
     
+    // ESTE É O NOME DA "GAVETA" ONDE SEUS DADOS DA NATIVIDADE ESTÃO
+    const NODE = 'biolab_natividade_marinho'; 
+
     let dados = { turmas: [], ti: 0, bim: 1 };
-    const iconesCientificos = ['🔬', '🔭', '🧪', '🧬', '⚛️', '🦠', '🌱', '🌍', '📡', '💡'];
+    const icones = ['🔬', '🧬', '🧪', '⚛️', '🦠'];
 
     db.ref(NODE).on('value', (snap) => {
-        if(snap.val()) dados = snap.val();
+        if(snap.val()) {
+            dados = snap.val();
+        }
         document.getElementById('loading').style.display = 'none';
         render();
     });
@@ -180,69 +124,48 @@
     function openPanel(id) { closeAll(); document.getElementById(id).style.display='block'; }
 
     function getMedia(aluno, bim, mIdx) {
-        const t = dados.turmas[dados.ti];
-        if(!t) return 0;
+        const t = dados.turmas[dados.ti]; if(!t) return 0;
         let kA = `${mIdx}_${bim}_vistos`;
         let totV = (t.vistos && t.vistos[mIdx]) || 10;
-        let notaV = ((aluno.sc?.[kA] || []).length / totV) * 10;
-        let notaExtra = 0;
-        let crits = (t.crits && t.crits[mIdx]) || [];
-        crits.forEach(c => notaExtra += parseFloat(aluno.sc?.[`${mIdx}_${bim}_${c}`] || 0));
-        let res = (notaV + notaExtra) / (crits.length + 1);
-        return isNaN(res) ? 0 : res;
+        let nV = ((aluno.sc?.[kA] || []).length / totV) * 10;
+        return isNaN(nV) ? 0 : nV;
     }
 
     function render() {
         const t = dados.turmas[dados.ti];
-        document.getElementById('list-turmas').innerHTML = (dados.turmas || []).map((x,i) => `<div style="padding:10px; border-bottom:1px solid #eee; cursor:pointer; ${i==dados.ti?'color:#b01a6b;font-weight:bold':''}" onclick="dados.ti=${i};salvar()">${x.n} <button onclick="delT(${i})" style="float:right; border:none; background:none; color:red;">❌</button></div>`).join('');
+        document.getElementById('list-turmas').innerHTML = (dados.turmas || []).map((x,i) => `<div style="padding:10px; cursor:pointer; ${i==dados.ti?'color:#b01a6b;font-weight:bold':''}" onclick="dados.ti=${i};salvar()">${x.n}</div>`).join('');
         
         if(!t) return;
         document.getElementById('label-turma').innerText = t.n;
         document.getElementById('label-materia').innerText = (t.mats && t.mats[t.mi]) || "---";
-        document.getElementById('qtd-v').value = (t.vistos && t.vistos[t.mi]) || 10;
 
-        document.getElementById('bim-selector').innerHTML = [1,2,3,4].map(b => `<button style="padding:8px 12px; border-radius:8px; border:none; cursor:pointer; background:${b==dados.bim?'#b01a6b':'#f0f0f0'}; color:${b==dados.bim?'white':'#666'}" onclick="event.stopPropagation(); dados.bim=${b};salvar()">${b}º BIM</button>`).join('');
+        document.getElementById('bim-selector').innerHTML = [1,2,3,4].map(b => `<button style="background:${b==dados.bim?'#b01a6b':'#eee'}; color:${b==dados.bim?'white':'#666'}" onclick="event.stopPropagation(); dados.bim=${b};salvar()">${b}º</button>`).join('');
 
         const listDiv = document.getElementById('student-list');
         listDiv.innerHTML = (t.st || []).map((s, si) => {
             let mB = getMedia(s, dados.bim, t.mi);
-            let mA = (getMedia(s,1,t.mi)+getMedia(s,2,t.mi)+getMedia(s,3,t.mi)+getMedia(s,4,t.mi))/4;
             let kA = `${t.mi}_${dados.bim}_vistos`;
             let grid = '';
             for(let i=0; i<((t.vistos && t.vistos[t.mi]) || 10); i++) {
                 grid += `<div class="visto-btn ${(s.sc?.[kA] || []).includes(i)?'checked':''}" onclick="tglV(${si},'${kA}',${i})">${i+1}</div>`;
             }
-            let critsHtml = ((t.crits && t.crits[t.mi]) || []).map(c => `
-                <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:12px;">
-                    <span>${c}:</span>
-                    <input type="number" step="0.1" value="${s.sc?.[`${t.mi}_${dados.bim}_${c}`] || 0}" onchange="upN(${si}, '${t.mi}_${dados.bim}_${c}', this.value)" style="width:45px;">
-                </div>`).join('');
-
-            return `<div class="student-card">
-                <div class="score-row"><span class="student-name">${s.n}</span><div style="text-align:right"><div class="grade-badge" style="color:${mB<7?'#d32f2f':'#388e3c'}">${mB.toFixed(1)}</div><div style="font-size:10px; font-weight:bold;">Anual: ${mA.toFixed(1)}</div></div></div>
-                <div class="vistos-grid">${grid}</div>${critsHtml}
-            </div>`;
+            return `<div class="student-card"><div class="score-row"><b>${s.n}</b><div class="grade-badge" style="color:${mB<7?'red':'green'}">${mB.toFixed(1)}</div></div><div class="vistos-grid">${grid}</div></div>`;
         }).join('');
 
         const lanes = document.getElementById('lanes-box'); lanes.innerHTML = '';
         (t.st || []).forEach((s, i) => {
             let n = getMedia(s, dados.bim, t.mi);
             let div = document.createElement('div'); div.className = 'lane';
-            div.innerHTML = `<div class="runner" style="left:${n*9}%"><span style="font-size:24px">${iconesCientificos[i % iconesCientificos.length]}</span><div class="runner-info" style="color:${n<7?'#d32f2f':'#388e3c'}">${s.n} | ${n.toFixed(1)}</div></div>`;
+            div.innerHTML = `<div class="runner" style="left:${n*9}%"><span>${icones[i % 5]}</span><div class="runner-info">${s.n} | ${n.toFixed(1)}</div></div>`;
             lanes.appendChild(div);
         });
     }
 
     function tglV(si, k, i) { let s = dados.turmas[dados.ti].st[si]; if(!s.sc) s.sc={}; if(!s.sc[k]) s.sc[k]=[]; let p = s.sc[k].indexOf(i); if(p > -1) s.sc[k].splice(p,1); else s.sc[k].push(i); salvar(); }
-    function upN(si, k, v) { if(!dados.turmas[dados.ti].st[si].sc) dados.turmas[dados.ti].st[si].sc={}; dados.turmas[dados.ti].st[si].sc[k] = parseFloat(v); salvar(); }
-    function upV(v) { if(!dados.turmas[dados.ti].vistos) dados.turmas[dados.ti].vistos=[]; dados.turmas[dados.ti].vistos[dados.turmas[dados.ti].mi] = parseInt(v); salvar(); }
-    function addT() { let n = document.getElementById('in-turma').value; if(n) { if(!dados.turmas) dados.turmas=[]; dados.turmas.push({n:n, mi:0, mats:['Ciências'], vistos:[10], crits:[['Comportamento']], st:[]}); salvar(); } }
-    function addM() { let n = document.getElementById('in-mat').value; if(n) { let t=dados.turmas[dados.ti]; t.mats.push(n); t.vistos.push(10); t.crits.push(['Comportamento']); t.mi = t.mats.length-1; salvar(); } }
+    function addT() { let n = document.getElementById('in-turma').value; if(n) { if(!dados.turmas) dados.turmas=[]; dados.turmas.push({n:n, mi:0, mats:['Ciências'], vistos:[10], st:[]}); salvar(); } }
+    function addM() { let n = document.getElementById('in-mat').value; if(n) { let t=dados.turmas[dados.ti]; t.mats.push(n); t.vistos.push(10); t.mi = t.mats.length-1; salvar(); } }
     function addS() { let ns = document.getElementById('in-alunos').value.split('\n'); ns.forEach(n => { if(n.trim()) dados.turmas[dados.ti].st.push({n:n.trim(), sc:{}}); }); salvar(); }
-    function delT(i) { if(confirm('Excluir turma?')) { dados.turmas.splice(i,1); dados.ti=0; salvar(); } }
-
     function exportBackup() { let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(dados)],{type:'application/json'})); a.download='Backup_Natividade.json'; a.click(); }
-    function importBackup(e) { let fr=new FileReader(); fr.onload=(ev)=>{ try { dados=JSON.parse(ev.target.result); salvar(); } catch(e){alert("Erro");} }; fr.readAsText(e.target.files[0]); }
 </script>
 </body>
 </html>
