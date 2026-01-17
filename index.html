@@ -24,23 +24,22 @@
         .nav-btn { flex: 1; padding: 10px 5px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-weight: bold; color: #555; font-size: 10px; text-transform: uppercase; }
         .nav-btn.active { background: #ffe1ed; color: #e91e63; }
 
-        .main-content { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; height: calc(100vh - 150px); }
-        .students-area { width: 330px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .main-content { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; }
+        .students-area { width: 320px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
         
-        /* AJUSTE FOCO NA ROLAGEM DO TABLET */
         .track-container { 
             flex: 1; 
             background: #1a2a3a; 
             border-radius: 20px; 
             padding: 5px; 
             border: 5px solid #2c3e50; 
-            overflow-y: scroll; /* Força a barra de rolagem */
-            -webkit-overflow-scrolling: touch; /* Rolagem suave no iPad/iOS */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
             position: relative; 
         }
         
         .lane { border-bottom: 1px solid rgba(255,255,255,0.08); position: relative; height: 38px; display: flex; align-items: center; width: 100%; }
-        .lane:last-child { margin-bottom: 50px; } /* Espaço para o último não sumir */
+        .lane:last-child { margin-bottom: 60px; }
 
         .runner { position: absolute; transition: 2s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 5px; z-index: 5; }
         .runner span { font-size: 20px; } 
@@ -100,6 +99,34 @@
     <section class="track-container" id="track"></section>
 </main>
 
+<div id="p-turmas" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Minhas Turmas</h3>
+    <div id="class-list" style="max-height: 250px; overflow-y: auto;"></div>
+    <input type="text" id="in-cl" placeholder="+ Nova Turma e Enter" onkeypress="if(event.key==='Enter') addT()" style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
+</div>
+
+<div id="p-materias" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Matérias</h3>
+    <div id="subj-list"></div>
+    <input type="text" id="in-sb" placeholder="+ Nova Matéria" onkeypress="if(event.key==='Enter') addM()" style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
+</div>
+
+<div id="p-crit" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Critérios de Avaliação</h3>
+    <div style="background:#f0f0f0; padding:10px; border-radius:8px; margin-bottom:10px;">
+        Vistos Totais: <input type="number" id="tot-at" onchange="setVistos(this.value)" style="width:60px; padding:5px;">
+    </div>
+    <div id="crit-list"></div>
+    <input type="text" id="in-cr" placeholder="+ Novo Critério e Enter" onkeypress="if(event.key==='Enter') addC()" style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
+</div>
+
+<div id="p-alunos" class="config-overlay" onclick="event.stopPropagation()">
+    <h3>Lista de Alunos</h3>
+    <textarea id="in-nm" style="width:100%; height:80px;" placeholder="Cole os nomes aqui..."></textarea>
+    <button onclick="addStus()" style="width:100%; background:#e91e63; color:white; border:none; padding:10px; margin:5px 0; border-radius:8px; cursor:pointer; font-weight:bold;">SALVAR ALUNOS</button>
+    <div id="stu-del-list" style="max-height: 200px; overflow-y: auto;"></div>
+</div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyDNuA_OeQDU-tNLW93afXEQ_UzfH00yP2A",
@@ -135,6 +162,12 @@
     }
     function fecharPaineis(e) { if(!e.target.closest('.config-overlay') && !e.target.closest('.nav-btn')) document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); }
 
+    function addT() { let v=document.getElementById('in-cl').value; if(v){ if(!dados.cs) dados.cs=[]; dados.cs.push({n:v, ss:['Ciências'], si:0, mCrits:{}, mTotA:{}, st:[]}); dados.ci=dados.cs.length-1; document.getElementById('in-cl').value=''; salvar(); }}
+    function addM() { let v=document.getElementById('in-sb').value; if(v && dados.ci>-1){ if(!dados.cs[dados.ci].ss) dados.cs[dados.ci].ss=[]; dados.cs[dados.ci].ss.push(v); document.getElementById('in-sb').value=''; salvar(); }}
+    function addC() { let v=document.getElementById('in-cr').value; const c=dados.cs[dados.ci]; if(v && c){ if(!c.mCrits) c.mCrits = {}; if(!c.mCrits[c.si]) c.mCrits[c.si] = []; c.mCrits[c.si].push({n: v}); document.getElementById('in-cr').value=''; salvar(); }}
+    function addStus() { let txt=document.getElementById('in-nm').value; let nomes=txt.split('\n').filter(x=>x.trim()); if(dados.ci>-1){ if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[]; nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojis[Math.floor(Math.random()*emojis.length)]})); dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); document.getElementById('in-nm').value=''; salvar(); }}
+    function setVistos(v) { if(dados.ci>-1) { let c=dados.cs[dados.ci]; if(!c.mTotA) c.mTotA={}; c.mTotA[c.si] = parseInt(v); salvar(); } }
+
     function getNota(aluno, bim=dados.b, matIdx=dados.cs[dados.ci].si) {
         const c = dados.cs[dados.ci]; if(!c) return 0;
         let kA = `${matIdx}_${bim}_ativ`, totA = (c.mTotA && c.mTotA[matIdx]) ? c.mTotA[matIdx] : 10;
@@ -151,61 +184,52 @@
 
     function renderizar() {
         const c = (dados.cs && dados.cs[dados.ci]) ? dados.cs[dados.ci] : null;
-        if(!c) return;
+        if(!c) { 
+            document.getElementById('stu-list').innerHTML = "<p style='padding:20px'>Crie uma turma para começar.</p>"; 
+            document.getElementById('class-list').innerHTML = (dados.cs || []).map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1;">${x.n}</span><span class="del-x" onclick="if(confirm('Excluir?')){dados.cs.splice(${i},1);salvar()}">✖</span></div>`).join('');
+            return; 
+        }
 
         document.getElementById('txt-turma').innerText = `TURMA: ${c.n}`;
         document.getElementById('txt-materia').innerText = `MATÉRIA: ${c.ss[c.si]}`;
 
-        let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
+        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n} <span class="qtd-badge">${(x.st||[]).length} alunos</span></span><span class="del-x" onclick="if(confirm('Excluir turma?')){dados.cs.splice(${i},1); if(dados.ci>=dados.cs.length) dados.ci=0; salvar()}">✖</span></div>`).join('');
+        document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="item-del"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; flex:1; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span class="del-x" onclick="if(confirm('Excluir matéria?')){c.ss.splice(${i},1); c.si=0; salvar()}">✖</span></div>`).join('');
         
+        let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
+        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="item-del"><span>🧪 ${cr.n}</span><span class="del-x" onclick="dados.cs[dados.ci].mCrits[dados.cs[dados.ci].si].splice(${i},1); salvar()">✖</span></div>`).join('');
+        
+        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="item-del"><span>${s.n}</span><span class="del-x" onclick="if(confirm('Excluir aluno?')){dados.cs[dados.ci].st.splice(${i},1); salvar()}">✖</span></div>`).join('');
+        document.getElementById('tot-at').value = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
+
         document.getElementById('stu-list').innerHTML = (c.st || []).map((s, si) => {
             let kA = `${c.si}_${dados.b}_ativ`, chs = '', tot = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
             let checks = (s.sc && s.sc[kA]) ? s.sc[kA] : [];
             for(let i=0; i<tot; i++) chs += `<div class="check-box ${checks.includes(i)?'active':''}" onclick="tglV(${si},'${kA}',${i})">${i+1}</div>`;
-            
             let nBim = getNota(s);
             let n1=getNota(s,1), n2=getNota(s,2), n3=getNota(s,3), n4=getNota(s,4);
             let nAnual = (n1+n2+n3+n4)/4;
-
             let crsHTML = critsAtuais.map(cr => {
                 let k = `${c.si}_${dados.b}_${cr.n}`;
                 let val = (s.sc && s.sc[k]) ? s.sc[k] : 0;
                 return `<div style="font-size:10px; display:flex; justify-content:space-between; margin-top:5px; background:#f9f9f9; padding:3px; border-radius:4px;">${cr.n} <input type="number" step="0.1" value="${val}" onchange="upNota(${si},'${k}',this.value)" style="width:40px; text-align:center;"></div>`;
             }).join('');
-            
-            return `<div class="student-card">
-                        <b>${s.n}</b> | <span class="nota-bim">${nBim.toFixed(1)}</span>
-                        <span class="nota-anual">Anual: ${nAnual.toFixed(1)}</span>
-                        <div class="check-grid">${chs}</div>
-                        ${crsHTML}
-                    </div>`;
+            return `<div class="student-card"><b>${s.n}</b> | <span class="nota-bim">${nBim.toFixed(1)}</span><span class="nota-anual">Anual: ${nAnual.toFixed(1)}</span><div class="check-grid">${chs}</div>${crsHTML}</div>`;
         }).join('');
 
         const track = document.getElementById('track'); track.innerHTML = '';
         (c.st || []).forEach(s => {
             let n = getNota(s);
             let lane = document.createElement('div'); lane.className = 'lane';
-            let emoji = s.em || '🚀';
-            lane.innerHTML = `<div class="runner" style="left:${n*8.8}%"><span>${emoji}</span><div class="runner-tag">${s.n} | ${n.toFixed(1)}</div></div>`;
+            lane.innerHTML = `<div class="runner" style="left:${n*8.8}%"><span>${s.em||'🚀'}</span><div class="runner-tag">${s.n} | ${n.toFixed(1)}</div></div>`;
             track.appendChild(lane);
         });
 
         document.getElementById('bim-tabs').innerHTML = [1,2,3,4].map(b=>`<button class="nav-btn ${b===dados.b?'active':''}" onclick="dados.b=${b};salvar()">${b}º BIM</button>`).join('');
     }
 
-    function tglV(si, k, idx) { 
-        let s=dados.cs[dados.ci].st[si]; 
-        if(!s.sc) s.sc = {};
-        if(!s.sc[k]) s.sc[k]=[]; 
-        let p=s.sc[k].indexOf(idx); 
-        if(p>-1) s.sc[k].splice(p,1); else s.sc[k].push(idx); 
-        salvar(); 
-    }
-    function upNota(si, k, v) { 
-        if(!dados.cs[dados.ci].st[si].sc) dados.cs[dados.ci].st[si].sc = {};
-        dados.cs[dados.ci].st[si].sc[k] = parseFloat(v); 
-        salvar(); 
-    }
+    function tglV(si, k, idx) { let s=dados.cs[dados.ci].st[si]; if(!s.sc) s.sc = {}; if(!s.sc[k]) s.sc[k]=[]; let p=s.sc[k].indexOf(idx); if(p>-1) s.sc[k].splice(p,1); else s.sc[k].push(idx); salvar(); }
+    function upNota(si, k, v) { if(!dados.cs[dados.ci].st[si].sc) dados.cs[dados.ci].st[si].sc = {}; dados.cs[dados.ci].st[si].sc[k] = parseFloat(v); salvar(); }
     function exportarBackup() { let b=new Blob([JSON.stringify(dados)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Biolab_Backup.json'; a.click(); }
     function importarBackup(e) { let fr=new FileReader(); fr.onload=(ev)=>{ try { dados=JSON.parse(ev.target.result); salvar(); } catch(e){alert("Erro ao ler arquivo");} }; fr.readAsText(e.target.files[0]); }
     function exportarExcel() {
@@ -219,11 +243,5 @@
         let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Notas_${c.n}.csv`; a.click();
     }
 </script>
-
-<div id="p-turmas" class="config-overlay" onclick="event.stopPropagation()">
-    <h3>Minhas Turmas</h3>
-    <div id="class-list" style="max-height: 250px; overflow-y: auto;"></div>
-    <input type="text" id="in-cl" placeholder="+ Nova Turma e Enter" onkeypress="if(event.key==='Enter') addT()" style="width:100%; padding:10px; margin-top:10px;">
-</div>
 </body>
 </html>
