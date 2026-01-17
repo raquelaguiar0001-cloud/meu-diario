@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIOLAB - NATIVIDADE</title>
+    <title>BIOLAB - UE. NATIVIDADE</title>
     
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔭</text></svg>">
+
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
@@ -73,9 +75,9 @@
 <header onclick="event.stopPropagation()">
     <div class="header-top">
         <div class="user-badge">
-            <div class="user-emoji">🧬</div>
+            <div class="user-emoji">🔭</div>
             <div>
-                <h1 style="margin:0; font-family:'Orbitron'; font-size:16px;">NATIVIDADE MARINHO</h1>
+                <h1 style="margin:0; font-family:'Orbitron'; font-size:16px;">UE. NATIVIDADE MARINHO</h1>
                 <p style="margin:0; font-size:11px;">PROF(A) RAQUEL AGUIAR</p>
             </div>
         </div>
@@ -242,29 +244,18 @@
     
     function exportarExcel() {
         const c = dados.cs[dados.ci]; if(!c) return;
-        let csv = "\ufeff"; // BOM para acentos no Excel
-        
+        let csv = "\ufeff";
         c.ss.forEach((materia, mIdx) => {
             csv += `MATÉRIA: ${materia.toUpperCase()}\n`;
             csv += "ALUNO;1º BIM;2º BIM;3º BIM;4º BIM;MÉDIA ANUAL\n";
-            
             c.st.forEach(s => {
-                let n1 = getNota(s, 1, mIdx);
-                let n2 = getNota(s, 2, mIdx);
-                let n3 = getNota(s, 3, mIdx);
-                let n4 = getNota(s, 4, mIdx);
-                let anual = (n1 + n2 + n3 + n4) / 4;
-                csv += `${s.n};${n1.toFixed(1)};${n2.toFixed(1)};${n3.toFixed(1)};${n4.toFixed(1)};${anual.toFixed(1)}\n`;
+                let n1 = getNota(s, 1, mIdx), n2 = getNota(s, 2, mIdx), n3 = getNota(s, 3, mIdx), n4 = getNota(s, 4, mIdx);
+                csv += `${s.n};${n1.toFixed(1)};${n2.toFixed(1)};${n3.toFixed(1)};${n4.toFixed(1)};${((n1 + n2 + n3 + n4) / 4).toFixed(1)}\n`;
             });
-            
-            csv += "\n\n"; // Espaço vazio entre as matérias
+            csv += "\n\n";
         });
-        
         let blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-        let a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Relatorio_Completo_${c.n}.csv`;
-        a.click();
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Relatorio_Completo_${c.n}.csv`; a.click();
     }
 </script>
 </body>
