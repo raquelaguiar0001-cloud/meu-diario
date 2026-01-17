@@ -27,24 +27,26 @@
         .main-content { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; }
         .students-area { width: 330px; display: flex; flex-direction: column; overflow-y: auto; }
         
-        .track-container { flex: 1; background: #1a2a3a; border-radius: 20px; padding: 10px; border: 5px solid #2c3e50; overflow-y: auto; position: relative; }
-        .lane { border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; height: 55px; display: flex; align-items: center; width: 100%; }
-        .runner { position: absolute; transition: 2s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 8px; z-index: 5; }
-        .runner span { font-size: 28px; }
-        .runner-tag { background: white; padding: 2px 8px; border-radius: 5px; font-weight: bold; font-size: 10px; border: 2px solid #e91e63; color: #333; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        /* AJUSTE NA PISTA PARA TABLET */
+        .track-container { flex: 1; background: #1a2a3a; border-radius: 20px; padding: 5px; border: 5px solid #2c3e50; overflow-y: auto; position: relative; }
+        .lane { border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; height: 45px; display: flex; align-items: center; width: 100%; }
+        .runner { position: absolute; transition: 2s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 5px; z-index: 5; }
+        .runner span { font-size: 22px; } /* Emoji um pouco menor */
+        .runner-tag { background: white; padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 9px; border: 2px solid #e91e63; color: #333; white-space: nowrap; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
 
-        .student-card { background: white; border-radius: 12px; margin-bottom: 8px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        .student-card { background: white; border-radius: 12px; margin-bottom: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .nota-bim { font-size: 1.1em; font-weight: bold; color: #e91e63; }
-        .nota-anual { font-size: 0.85em; color: #666; display: block; margin-top: 2px; }
+        .nota-anual { font-size: 0.82em; color: #666; display: block; margin-top: 1px; font-weight: 600; }
         
-        .check-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .check-box { width: 30px; height: 30px; border: 2px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; font-weight: bold; font-size: 11px; }
+        .check-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .check-box { width: 28px; height: 28px; border: 2px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; font-weight: bold; font-size: 10px; }
         .check-box.active { background: #2ecc71; color: white; border-color: #27ae60; }
 
         .config-overlay { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: white; border-radius: 15px; padding: 20px; width: 90%; max-width: 450px; box-shadow: 0 10px 50px rgba(0,0,0,0.6); z-index: 100; display: none; border: 3px solid #e91e63; }
-        .item-del { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+        .item-del { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee; align-items: center; }
         .del-x { color: #ff4757; cursor: pointer; font-weight: bold; font-size: 18px; padding: 5px 10px; }
         .btn-action { cursor: pointer; padding: 8px 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 11px; }
+        .qtd-badge { background: #eee; padding: 2px 6px; border-radius: 10px; font-size: 10px; color: #666; margin-left: 5px; }
 
         #loading { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; }
     </style>
@@ -88,14 +90,14 @@
 
 <div id="p-turmas" class="config-overlay" onclick="event.stopPropagation()">
     <h3>Minhas Turmas</h3>
-    <div id="class-list" style="max-height: 200px; overflow-y: auto;"></div>
-    <input type="text" id="in-cl" placeholder="+ Nova Turma e Enter" onkeypress="if(event.key==='Enter') addT()" style="width:100%; padding:10px; margin-top:10px;">
+    <div id="class-list" style="max-height: 250px; overflow-y: auto;"></div>
+    <input type="text" id="in-cl" placeholder="+ Nova Turma e Enter" onkeypress="if(event.key==='Enter') addT()" style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
 </div>
 
 <div id="p-materias" class="config-overlay" onclick="event.stopPropagation()">
     <h3>Matérias</h3>
     <div id="subj-list"></div>
-    <input type="text" id="in-sb" placeholder="+ Nova Matéria" onkeypress="if(event.key==='Enter') addM()" style="width:100%; padding:10px; margin-top:10px;">
+    <input type="text" id="in-sb" placeholder="+ Nova Matéria" onkeypress="if(event.key==='Enter') addM()" style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
 </div>
 
 <div id="p-crit" class="config-overlay" onclick="event.stopPropagation()">
@@ -104,14 +106,14 @@
         Vistos Totais: <input type="number" id="tot-at" onchange="setVistos(this.value)" style="width:60px; padding:5px;">
     </div>
     <div id="crit-list"></div>
-    <input type="text" id="in-cr" placeholder="+ Novo Critério e Enter" onkeypress="if(event.key==='Enter') addC()" style="width:100%; padding:10px; margin-top:10px;">
+    <input type="text" id="in-cr" placeholder="+ Novo Critério e Enter" onkeypress="if(event.key==='Enter') addC()" style="width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
 </div>
 
 <div id="p-alunos" class="config-overlay" onclick="event.stopPropagation()">
     <h3>Lista de Alunos</h3>
     <textarea id="in-nm" style="width:100%; height:80px;" placeholder="Cole os nomes aqui..."></textarea>
     <button onclick="addStus()" style="width:100%; background:#e91e63; color:white; border:none; padding:10px; margin:5px 0; border-radius:8px; cursor:pointer; font-weight:bold;">SALVAR ALUNOS</button>
-    <div id="stu-del-list" style="max-height: 150px; overflow-y: auto;"></div>
+    <div id="stu-del-list" style="max-height: 200px; overflow-y: auto;"></div>
 </div>
 
 <script>
@@ -199,7 +201,7 @@
         document.getElementById('txt-turma').innerText = `TURMA: ${c.n}`;
         document.getElementById('txt-materia').innerText = `MATÉRIA: ${c.ss[c.si]}`;
 
-        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span class="del-x" onclick="if(confirm('Excluir turma?')){dados.cs.splice(${i},1); if(dados.ci>=dados.cs.length) dados.ci=0; salvar()}">✖</span></div>`).join('');
+        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="item-del"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; flex:1; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n} <span class="qtd-badge">${(x.st||[]).length} alunos</span></span><span class="del-x" onclick="if(confirm('Excluir turma?')){dados.cs.splice(${i},1); if(dados.ci>=dados.cs.length) dados.ci=0; salvar()}">✖</span></div>`).join('');
         document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="item-del"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; flex:1; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span class="del-x" onclick="if(confirm('Excluir matéria?')){c.ss.splice(${i},1); c.si=0; salvar()}">✖</span></div>`).join('');
         
         let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
@@ -224,8 +226,8 @@
             }).join('');
             
             return `<div class="student-card">
-                        <b>${s.n}</b> | <span class="nota-bim">Nota: ${nBim.toFixed(1)}</span>
-                        <span class="nota-anual">Média Anual: ${nAnual.toFixed(1)}</span>
+                        <b>${s.n}</b> | <span class="nota-bim">${nBim.toFixed(1)}</span>
+                        <span class="nota-anual">Anual: ${nAnual.toFixed(1)}</span>
                         <div class="check-grid">${chs}</div>
                         ${crsHTML}
                     </div>`;
