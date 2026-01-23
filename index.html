@@ -23,7 +23,7 @@
             overflow: hidden; color: white;
         }
 
-        /* CONFIGURAÇÃO DOS EMOJIS FLUTUANTES ALEATÓRIOS */
+        /* CONFIGURAÇÃO DOS EMOJIS FLUTUANTES - VISUALIZAÇÃO MELHORADA */
         .emoji-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -34,23 +34,24 @@
 
         .floating-emoji {
             position: absolute;
-            font-size: 20px;
-            opacity: 0.4;
+            font-size: 32px; /* Aumentado para melhor visualização */
+            opacity: 0.7; /* Mais visível */
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
             animation: floatRandom linear infinite;
         }
 
         @keyframes floatRandom {
             0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(100px, 50px) rotate(90deg); }
-            50% { transform: translate(200px, 0px) rotate(180deg); }
-            75% { transform: translate(100px, -50px) rotate(270deg); }
+            25% { transform: translate(120px, 60px) rotate(90deg); }
+            50% { transform: translate(240px, 0px) rotate(180deg); }
+            75% { transform: translate(120px, -60px) rotate(270deg); }
             100% { transform: translate(0, 0) rotate(360deg); }
         }
 
         header { 
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px);
             padding: 15px; margin: 10px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
             z-index: 10; flex-shrink: 0; position: relative; overflow: hidden;
         }
 
@@ -65,7 +66,7 @@
 
         .info-fixa { 
             position: relative; z-index: 5;
-            background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 30px; 
+            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 30px; 
             margin-top: 10px; display: flex; gap: 20px; 
             font-weight: bold; font-size: 14px; border: 1px solid rgba(255,255,255,0.2); color: #ffeb3b;
         }
@@ -116,7 +117,7 @@
             <div class="user-emoji">🔭</div>
             <div>
                 <h1 style="margin:0; font-family:'Orbitron'; font-size:18px;">UE. NATIVIDADE MARINHO</h1>
-                <p style="margin:0; font-size:12px; opacity:0.8;">PROF(A) RAQUEL AGUIAR</p>
+                <p style="margin:0; font-size:12px; opacity:0.9;">PROF(A) RAQUEL AGUIAR</p>
             </div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -173,7 +174,6 @@
     let dados = { cs: [], ci: 0, b: 1 };
     const emojisProf = ['🧪','🧬','🔬','⚛️','🪐','🇬🇧','🇺🇸','🗽','🗣️','📚','🌍'];
 
-    // GERAR EMOJIS ALEATÓRIOS NO HEADER
     function initEmojiFloat() {
         const container = document.getElementById('emoji-container');
         for (let i = 0; i < 15; i++) {
@@ -182,7 +182,7 @@
             span.innerText = emojisProf[Math.floor(Math.random() * emojisProf.length)];
             span.style.left = Math.random() * 100 + '%';
             span.style.top = Math.random() * 100 + '%';
-            span.style.animationDuration = (10 + Math.random() * 20) + 's';
+            span.style.animationDuration = (12 + Math.random() * 18) + 's';
             span.style.animationDelay = (Math.random() * 5) + 's';
             container.appendChild(span);
         }
