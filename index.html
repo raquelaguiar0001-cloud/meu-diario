@@ -23,24 +23,28 @@
             overflow: hidden; color: white;
         }
 
-        /* Estilo da área de emojis flutuantes */
-        .emoji-track {
+        /* CONFIGURAÇÃO DOS EMOJIS FLUTUANTES ALEATÓRIOS */
+        .emoji-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden; pointer-events: none;
-            display: flex; align-items: center;
-            opacity: 0.3; z-index: 1;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
         }
 
-        .emoji-move {
-            display: flex; gap: 50px; font-size: 24px;
-            animation: moveEmojis 20s linear infinite;
-            white-space: nowrap;
+        .floating-emoji {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.4;
+            animation: floatRandom linear infinite;
         }
 
-        @keyframes moveEmojis {
-            from { transform: translateX(100%); }
-            to { transform: translateX(-100%); }
+        @keyframes floatRandom {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, 50px) rotate(90deg); }
+            50% { transform: translate(200px, 0px) rotate(180deg); }
+            75% { transform: translate(100px, -50px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
         }
 
         header { 
@@ -51,7 +55,6 @@
         }
 
         .header-top { position: relative; z-index: 5; display: flex; justify-content: space-between; align-items: center; }
-        
         .user-badge { display: flex; align-items: center; gap: 15px; }
         .user-emoji { 
             font-size: 28px; background: linear-gradient(135deg, #e91e63, #9b4dca); 
@@ -106,11 +109,7 @@
 <div id="loading"><b>🧪 SINCRONIZANDO BIOLAB...</b></div>
 
 <header onclick="event.stopPropagation()">
-    <div class="emoji-track">
-        <div class="emoji-move">
-            🧪 🧬 🔬 ⚛️ 🦠 🪐 🇬🇧 🇺🇸 🗽 🗣️ 📚 🌍 🧪 🧬 🔬 ⚛️ 🦠 🪐 🇬🇧 🇺🇸 🗽 🗣️ 📚 🌍
-        </div>
-    </div>
+    <div id="emoji-container" class="emoji-bg"></div>
 
     <div class="header-top">
         <div class="user-badge">
@@ -172,7 +171,23 @@
     const db = firebase.database();
 
     let dados = { cs: [], ci: 0, b: 1 };
-    const emojis = ['🚀','🧬','🔬','🧪','🪐','🌿','🔭','👾','🛸','🌍','⚛️'];
+    const emojisProf = ['🧪','🧬','🔬','⚛️','🪐','🇬🇧','🇺🇸','🗽','🗣️','📚','🌍'];
+
+    // GERAR EMOJIS ALEATÓRIOS NO HEADER
+    function initEmojiFloat() {
+        const container = document.getElementById('emoji-container');
+        for (let i = 0; i < 15; i++) {
+            const span = document.createElement('span');
+            span.className = 'floating-emoji';
+            span.innerText = emojisProf[Math.floor(Math.random() * emojisProf.length)];
+            span.style.left = Math.random() * 100 + '%';
+            span.style.top = Math.random() * 100 + '%';
+            span.style.animationDuration = (10 + Math.random() * 20) + 's';
+            span.style.animationDelay = (Math.random() * 5) + 's';
+            container.appendChild(span);
+        }
+    }
+    initEmojiFloat();
 
     db.ref('biolab_v15').on('value', (snap) => {
         const val = snap.val();
@@ -192,7 +207,7 @@
     function addT() { let v=document.getElementById('in-cl').value; if(v){ if(!dados.cs) dados.cs=[]; dados.cs.push({n:v, ss:['Ciências'], si:0, mCrits:{}, mTotA:{}, st:[]}); dados.ci=dados.cs.length-1; document.getElementById('in-cl').value=''; salvar(); }}
     function addM() { let v=document.getElementById('in-sb').value; if(v && dados.ci>-1){ if(!dados.cs[dados.ci].ss) dados.cs[dados.ci].ss=[]; dados.cs[dados.ci].ss.push(v); document.getElementById('in-sb').value=''; salvar(); }}
     function addC() { let v=document.getElementById('in-cr').value; const c=dados.cs[dados.ci]; if(v && c){ if(!c.mCrits) c.mCrits = {}; if(!c.mCrits[c.si]) c.mCrits[c.si] = []; c.mCrits[c.si].push({n: v}); document.getElementById('in-cr').value=''; salvar(); }}
-    function addStus() { let txt=document.getElementById('in-nm').value; let nomes=txt.split('\n').filter(x=>x.trim()); if(dados.ci>-1){ if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[]; nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojis[Math.floor(Math.random()*emojis.length)]})); dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); document.getElementById('in-nm').value=''; salvar(); }}
+    function addStus() { let txt=document.getElementById('in-nm').value; let nomes=txt.split('\n').filter(x=>x.trim()); if(dados.ci>-1){ if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[]; nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojisProf[Math.floor(Math.random()*emojisProf.length)]})); dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); document.getElementById('in-nm').value=''; salvar(); }}
     function setVistos(v) { if(dados.ci>-1) { let c=dados.cs[dados.ci]; if(!c.mTotA) c.mTotA={}; c.mTotA[c.si] = parseInt(v); salvar(); } }
 
     function delT(idx) { if(confirm("Excluir esta turma permanentemente?")) { dados.cs.splice(idx, 1); if(dados.ci >= dados.cs.length) dados.ci = 0; salvar(); } }
