@@ -18,8 +18,7 @@
         body { 
             font-family: 'Fredoka', sans-serif; 
             margin: 0; height: 100vh; display: flex; flex-direction: column; 
-            background: #0b0118;
-            background-color: #240b36;
+            background: #240b36;
             background-image: linear-gradient(135deg, #240b36 0%, #c31432 100%);
             overflow: hidden; color: white;
         }
@@ -74,7 +73,8 @@
         .btn-action { cursor: pointer; padding: 10px 18px; border-radius: 12px; border: none; font-weight: bold; font-size: 12px; }
 
         .config-overlay { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: white; color: #333; border-radius: 25px; padding: 25px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); z-index: 100; display: none; border: 4px solid #e91e63; }
-        .del-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .del-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
+        .del-btn { color: #ff4757; font-weight: bold; cursor: pointer; padding: 5px 10px; font-size: 18px; }
 
         #loading { position: fixed; inset: 0; background: #240b36; color: white; font-family: 'Orbitron'; font-size: 20px; display: flex; align-items: center; justify-content: center; z-index: 9999; }
     </style>
@@ -160,11 +160,19 @@
     function salvar() { db.ref('biolab_v15').set(dados); }
     function abrirPainel(id) { document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); document.getElementById(id).style.display = 'block'; }
     function fecharPaineis(e) { if(!e.target.closest('.config-overlay') && !e.target.closest('.nav-btn')) document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); }
+    
+    // Funções de Adição
     function addT() { let v=document.getElementById('in-cl').value; if(v){ if(!dados.cs) dados.cs=[]; dados.cs.push({n:v, ss:['Ciências'], si:0, mCrits:{}, mTotA:{}, st:[]}); dados.ci=dados.cs.length-1; document.getElementById('in-cl').value=''; salvar(); }}
     function addM() { let v=document.getElementById('in-sb').value; if(v && dados.ci>-1){ if(!dados.cs[dados.ci].ss) dados.cs[dados.ci].ss=[]; dados.cs[dados.ci].ss.push(v); document.getElementById('in-sb').value=''; salvar(); }}
     function addC() { let v=document.getElementById('in-cr').value; const c=dados.cs[dados.ci]; if(v && c){ if(!c.mCrits) c.mCrits = {}; if(!c.mCrits[c.si]) c.mCrits[c.si] = []; c.mCrits[c.si].push({n: v}); document.getElementById('in-cr').value=''; salvar(); }}
     function addStus() { let txt=document.getElementById('in-nm').value; let nomes=txt.split('\n').filter(x=>x.trim()); if(dados.ci>-1){ if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[]; nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojis[Math.floor(Math.random()*emojis.length)]})); dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); document.getElementById('in-nm').value=''; salvar(); }}
     function setVistos(v) { if(dados.ci>-1) { let c=dados.cs[dados.ci]; if(!c.mTotA) c.mTotA={}; c.mTotA[c.si] = parseInt(v); salvar(); } }
+
+    // Funções de Exclusão (Corrigidas)
+    function delT(idx) { if(confirm("Excluir esta turma permanentemente?")) { dados.cs.splice(idx, 1); if(dados.ci >= dados.cs.length) dados.ci = 0; salvar(); } }
+    function delM(idx) { if(confirm("Excluir esta matéria?")) { dados.cs[dados.ci].ss.splice(idx, 1); if(dados.cs[dados.ci].si >= dados.cs[dados.ci].ss.length) dados.cs[dados.ci].si = 0; salvar(); } }
+    function delS(idx) { if(confirm("Remover este aluno?")) { dados.cs[dados.ci].st.splice(idx, 1); salvar(); } }
+    function delC(idx) { if(confirm("Remover este critério?")) { dados.cs[dados.ci].mCrits[dados.cs[dados.ci].si].splice(idx, 1); salvar(); } }
 
     function getNota(aluno, bim, matIdx) {
         const c = dados.cs[dados.ci]; if(!c) return 0;
@@ -188,15 +196,13 @@
         document.getElementById('txt-materia').innerText = `🧬 MATÉRIA: ${c.ss[c.si]}`;
         document.getElementById('txt-total-alunos').innerText = `👥 ALUNOS: ${(c.st || []).length}`;
 
-        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="del-item"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span onclick="if(confirm('Excluir turma?')){dados.cs.splice(${i},1);salvar()}" style="color:red; cursor:pointer">✖</span></div>`).join('');
-        document.getElementById('subj-list').innerHTML = c.ss.map((s,i)=>`<div class="del-item"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span onclick="if(confirm('Excluir matéria?')){c.ss.splice(${i},1);salvar()}" style="color:red; cursor:pointer">✖</span></div>`).join('');
+        // Listas de Configuração com botões de exclusão corrigidos
+        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`<div class="del-item"><span onclick="dados.ci=${i};salvar()" style="cursor:pointer; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span><span class="del-btn" onclick="delT(${i})">✖</span></div>`).join('');
+        document.getElementById('subj-list').innerHTML = (c.ss || []).map((s,i)=>`<div class="del-item"><span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span><span class="del-btn" onclick="delM(${i})">✖</span></div>`).join('');
+        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="del-item"><span>${s.n}</span><span class="del-btn" onclick="delS(${i})">✖</span></div>`).join('');
         
-        // Renderizar Lista de Alunos para exclusão no painel de Alunos
-        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="del-item"><span>${s.n}</span><span onclick="if(confirm('Remover aluno?')){c.st.splice(${i},1);salvar()}" style="color:red; cursor:pointer">✖</span></div>`).join('');
-
-        // Renderizar Critérios na Aba de Critérios
         let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
-        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="del-item"><span>${cr.n}</span><span onclick="if(confirm('Remover critério?')){c.mCrits[c.si].splice(${i},1);salvar()}" style="color:red; cursor:pointer">✖</span></div>`).join('');
+        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="del-item"><span>${cr.n}</span><span class="del-btn" onclick="delC(${i})">✖</span></div>`).join('');
 
         document.getElementById('tot-at').value = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
 
