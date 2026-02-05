@@ -75,7 +75,7 @@
         .nav-btn.active { background: #e91e63; box-shadow: 0 0 15px #e91e63; }
 
         .main-content { display: flex; flex: 1; padding: 10px; gap: 15px; overflow: hidden; }
-        .students-area { width: 350px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .students-area { width: 350px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; z-index: 5; }
         .track-container { flex: 1; background: rgba(0, 0, 0, 0.5); border-radius: 30px; border: 2px solid rgba(255,255,255,0.1); overflow-y: auto; position: relative; height: 100%; }
 
         #lanes-box { padding: 20px 0 150px 0; min-height: 100%; }
@@ -85,17 +85,19 @@
         .runner span { font-size: 28px; filter: drop-shadow(0 0 5px white); } 
         .runner-tag { background: white; padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 10px; color: #1a2a3a; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 3px solid #ccc; }
 
-        .student-card { background: white; color: #333; border-radius: 20px; margin-bottom: 12px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 8px solid #ddd; cursor: pointer; }
-        .student-card:active { transform: scale(0.98); }
+        .student-card { background: white; color: #333; border-radius: 20px; margin-bottom: 12px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 8px solid #ddd; cursor: pointer; position: relative; }
+        .student-card:active { transform: scale(0.96); }
         .nota-red { color: #ff4757 !important; }
         .nota-green { color: #2ed573 !important; }
         .nota-bim { font-size: 1.4em; font-weight: 700; }
         
-        .check-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-        .check-box { width: 32px; height: 32px; border: 2px solid #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f8f9fa; font-weight: bold; font-size: 12px; color: #333; }
-        .check-box.active { background: #2ecc71; color: white; border-color: #27ae60; }
+        .check-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .check-box { width: 35px; height: 35px; border: 2px solid #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f8f9fa; font-weight: bold; font-size: 14px; color: #333; }
+        .check-box.active { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
 
-        .config-overlay { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: white; color: #333; border-radius: 25px; padding: 25px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); z-index: 100; display: none; border: 4px solid #e91e63; }
+        /* Aumentado o z-index para ficar na frente de tudo */
+        .config-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: #333; border-radius: 25px; padding: 25px; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); z-index: 1000; display: none; border: 4px solid #e91e63; }
+        
         .del-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
         .btn-move { background: #f0f0f0; border: none; border-radius: 5px; cursor: pointer; padding: 2px 8px; font-weight: bold; margin-left: 5px; color: #666; }
         .del-btn { color: #ff4757; font-weight: bold; cursor: pointer; padding: 5px 10px; font-size: 18px; }
@@ -157,12 +159,12 @@
 
 <div id="p-aval" class="config-overlay" onclick="event.stopPropagation()">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e91e63; padding-bottom:10px; margin-bottom:15px;">
-        <button onclick="navegarAluno(-1)" style="background:#666; color:white; border:none; border-radius:10px; padding:8px 15px; cursor:pointer; font-weight:bold;">◀</button>
-        <h3 id="aval-nome-aluno" style="font-family:'Orbitron'; margin:0; font-size:16px; color:#e91e63; text-align:center;">NOME</h3>
-        <button onclick="navegarAluno(1)" style="background:#666; color:white; border:none; border-radius:10px; padding:8px 15px; cursor:pointer; font-weight:bold;">▶</button>
+        <button onclick="navegarAluno(-1)" style="background:#666; color:white; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:bold;">◀</button>
+        <h3 id="aval-nome-aluno" style="font-family:'Orbitron'; margin:0; font-size:16px; color:#e91e63; text-align:center;">---</h3>
+        <button onclick="navegarAluno(1)" style="background:#666; color:white; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:bold;">▶</button>
     </div>
-    <div id="aval-conteudo" style="max-height: 350px; overflow-y: auto;"></div>
-    <button onclick="fecharPaineis(event)" style="width:100%; margin-top:15px; background:#ddd; border:none; padding:10px; border-radius:10px; font-weight:bold; color:#333;">VOLTAR À LISTA</button>
+    <div id="aval-conteudo" style="max-height: 350px; overflow-y: auto; padding: 5px;"></div>
+    <button onclick="document.getElementById('p-aval').style.display='none'" style="width:100%; margin-top:15px; background:#f0f2f5; border:none; padding:12px; border-radius:10px; font-weight:bold; color:#333; cursor:pointer;">FECHAR E VOLTAR</button>
 </div>
 
 <script>
@@ -213,37 +215,13 @@
 
     function salvar() { db.ref('biolab_v15').set(dados); }
     function abrirPainel(id) { document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); document.getElementById(id).style.display = 'block'; }
-    function fecharPaineis(e) { if(!e.target.closest('.config-overlay') && !e.target.closest('.nav-btn')) document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); }
+    function fecharPaineis(e) { if(!e.target.closest('.config-overlay') && !e.target.closest('.student-card') && !e.target.closest('.nav-btn')) document.querySelectorAll('.config-overlay').forEach(p => p.style.display = 'none'); }
     
-    function moverT(idx, dir) {
-        let n = idx + dir;
-        if (n >= 0 && n < dados.cs.length) {
-            let item = dados.cs.splice(idx, 1)[0];
-            dados.cs.splice(n, 0, item);
-            dados.ci = n; salvar();
-        }
-    }
-
-    function moverM(idx, dir) {
-        let c = dados.cs[dados.ci];
-        let n = idx + dir;
-        if (n >= 0 && n < c.ss.length) {
-            let item = c.ss.splice(idx, 1)[0];
-            c.ss.splice(n, 0, item);
-            c.si = n; salvar();
-        }
-    }
-
     function addT() { let v=document.getElementById('in-cl').value; if(v){ if(!dados.cs) dados.cs=[]; dados.cs.push({n:v, ss:['Ciências'], si:0, mCrits:{}, mTotA:{}, st:[]}); dados.ci=dados.cs.length-1; document.getElementById('in-cl').value=''; salvar(); }}
     function addM() { let v=document.getElementById('in-sb').value; if(v && dados.ci>-1){ if(!dados.cs[dados.ci].ss) dados.cs[dados.ci].ss=[]; dados.cs[dados.ci].ss.push(v); document.getElementById('in-sb').value=''; salvar(); }}
     function addC() { let v=document.getElementById('in-cr').value; const c=dados.cs[dados.ci]; if(v && c){ if(!c.mCrits) c.mCrits = {}; if(!c.mCrits[c.si]) c.mCrits[c.si] = []; c.mCrits[c.si].push({n: v}); document.getElementById('in-cr').value=''; salvar(); }}
     function addStus() { let txt=document.getElementById('in-nm').value; let nomes=txt.split('\n').filter(x=>x.trim()); if(dados.ci>-1){ if(!dados.cs[dados.ci].st) dados.cs[dados.ci].st=[]; nomes.forEach(n=>dados.cs[dados.ci].st.push({n:n.trim(), sc:{}, em:emojisProf[Math.floor(Math.random()*emojisProf.length)]})); dados.cs[dados.ci].st.sort((a,b)=>a.n.localeCompare(b.n)); document.getElementById('in-nm').value=''; salvar(); }}
     function setVistos(v) { if(dados.ci>-1) { let c=dados.cs[dados.ci]; if(!c.mTotA) c.mTotA={}; c.mTotA[c.si] = parseInt(v); salvar(); } }
-
-    function delT(idx) { if(confirm("Excluir esta turma?")) { dados.cs.splice(idx, 1); if(dados.ci >= dados.cs.length) dados.ci = 0; salvar(); } }
-    function delM(idx) { if(confirm("Excluir esta matéria?")) { dados.cs[dados.ci].ss.splice(idx, 1); if(dados.cs[dados.ci].si >= dados.cs[dados.ci].ss.length) dados.cs[dados.ci].si = 0; salvar(); } }
-    function delS(idx) { if(confirm("Remover este aluno?")) { dados.cs[dados.ci].st.splice(idx, 1); salvar(); } }
-    function delC(idx) { if(confirm("Remover este critério?")) { dados.cs[dados.ci].mCrits[dados.cs[dados.ci].si].splice(idx, 1); salvar(); } }
 
     function getNota(aluno, b, si) {
         const c = dados.cs[dados.ci]; if(!c) return 0;
@@ -270,6 +248,7 @@
         
         let kA = `${c.si}_${dados.b}_ativ`, chs = '', tot = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
         let checks = (s.sc && s.sc[kA]) ? s.sc[kA] : [];
+        
         for(let i=0; i<tot; i++) {
             chs += `<div class="check-box ${checks.includes(i)?'active':''}" onclick="tglV(${idx},'${kA}',${i})">${i+1}</div>`;
         }
@@ -277,19 +256,19 @@
         let crsHTML = critsAtuais.map(cr => {
             let k = `${c.si}_${dados.b}_${cr.n}`;
             let val = (s.sc && s.sc[k]) ? s.sc[k] : 0;
-            return `<div style="margin-top:15px; background:#f0f2f5; padding:10px; border-radius:10px;">
-                        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px; color:#333;">${cr.n}</label>
-                        <input type="number" step="0.1" value="${val}" onchange="upNota(${idx},'${k}',this.value)" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ddd; font-size:16px;">
+            return `<div style="margin-top:15px; background:#f8f9fa; padding:12px; border-radius:12px; border:1px solid #eee;">
+                        <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:8px; color:#555;">${cr.n.toUpperCase()}</label>
+                        <input type="number" step="0.1" value="${val}" onchange="upNota(${idx},'${k}',this.value)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:18px; font-weight:bold; text-align:center; color:#e91e63;">
                     </div>`;
         }).join('');
 
         document.getElementById('aval-conteudo').innerHTML = `
-            <div style="text-align:center; margin-bottom:10px;"><span style="font-size:12px; color:#666;">Vistos do Bimestre:</span></div>
+            <div style="text-align:center; margin-bottom:12px;"><span style="font-size:12px; font-weight:bold; color:#888;">MARQUE OS VISTOS:</span></div>
             <div class="check-grid" style="justify-content:center;">${chs}</div>
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+            <hr style="border:0; border-top:2px solid #f0f0f0; margin:20px 0;">
             ${crsHTML}
         `;
-        abrirPainel('p-aval');
+        document.getElementById('p-aval').style.display = 'block';
     }
 
     function navegarAluno(dir) {
@@ -305,33 +284,6 @@
         document.getElementById('txt-turma').innerText = `🚀 TURMA: ${c.n}`;
         document.getElementById('txt-materia').innerText = `🧬 MATÉRIA: ${c.ss[c.si]}`;
         document.getElementById('txt-total-alunos').innerText = `👥 ALUNOS: ${(c.st || []).length}`;
-
-        document.getElementById('class-list').innerHTML = dados.cs.map((x,i)=>`
-            <div class="del-item">
-                <span onclick="dados.ci=${i};salvar()" style="cursor:pointer; ${i===dados.ci?'font-weight:bold; color:#e91e63':''}">${x.n}</span>
-                <div>
-                    <button class="btn-move" onclick="moverT(${i}, -1)">↑</button>
-                    <button class="btn-move" onclick="moverT(${i}, 1)">↓</button>
-                    <span class="del-btn" onclick="delT(${i})">✖</span>
-                </div>
-            </div>`).join('');
-
-        document.getElementById('subj-list').innerHTML = (c.ss || []).map((s,i)=>`
-            <div class="del-item">
-                <span onclick="dados.cs[dados.ci].si=${i};salvar()" style="cursor:pointer; ${i===c.si?'font-weight:bold; color:#e91e63':''}">${s}</span>
-                <div>
-                    <button class="btn-move" onclick="moverM(${i}, -1)">↑</button>
-                    <button class="btn-move" onclick="moverM(${i}, 1)">↓</button>
-                    <span class="del-btn" onclick="delM(${i})">✖</span>
-                </div>
-            </div>`).join('');
-
-        document.getElementById('stu-del-list').innerHTML = (c.st || []).map((s,i)=>`<div class="del-item"><span>${s.n}</span><span class="del-btn" onclick="delS(${i})">✖</span></div>`).join('');
-        
-        let critsAtuais = (c.mCrits && c.mCrits[c.si]) ? c.mCrits[c.si] : [];
-        document.getElementById('crit-list').innerHTML = critsAtuais.map((cr,i)=>`<div class="del-item"><span>${cr.n}</span><span class="del-btn" onclick="delC(${i})">✖</span></div>`).join('');
-
-        document.getElementById('tot-at').value = (c.mTotA && c.mTotA[c.si]) ? c.mTotA[c.si] : 10;
 
         document.getElementById('stu-list').innerHTML = (c.st || []).map((s, idx) => {
             let nBim = getNota(s, dados.b, c.si);
@@ -370,6 +322,7 @@
     function tglV(si, k, idx) { let s=dados.cs[dados.ci].st[si]; if(!s.sc) s.sc = {}; if(!s.sc[k]) s.sc[k]=[]; let p=s.sc[k].indexOf(idx); if(p>-1) s.sc[k].splice(p,1); else s.sc[k].push(idx); salvar(); }
     function upNota(si, k, v) { if(!dados.cs[dados.ci].st[si].sc) dados.cs[dados.ci].st[si].sc = {}; dados.cs[dados.ci].st[si].sc[k] = parseFloat(v); salvar(); }
     
+    // Funções de backup/exportação (sem alteração)
     function exportarExcelCompleto() {
         const c = dados.cs[dados.ci]; if(!c) return;
         let csv = "\ufeff"; 
@@ -384,7 +337,6 @@
         });
         let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8;'})); a.download = `RELATORIO_NATIVIDADE_${c.n}.csv`; a.click();
     }
-
     function exportarBackup() { let b=new Blob([JSON.stringify(dados)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Biolab_Backup.json'; a.click(); }
     function importarBackup(e) { let fr=new FileReader(); fr.onload=(ev)=>{ try { dados=JSON.parse(ev.target.result); salvar(); } catch(e){alert("Erro");} }; fr.readAsText(e.target.files[0]); }
 </script>
